@@ -82,11 +82,6 @@ baseH$tendance <- as.numeric(mydec$trend)
 baseH$residu <- as.numeric(mydec$random)
 baseH$saison <- as.numeric(mydec$seasonal)
 
-baseH$tendance <- as.numeric(mydec2$trend)
-baseH$residu <- as.numeric(mydec2$random)
-baseH$saison <- as.numeric(mydec2$seasonal)
-
-
 ggplot(data = baseH, aes(x = date)) +
   geom_line(aes(y = tendance), color = "green") +
   geom_line(aes(y = residu), color = "red") +
@@ -165,13 +160,17 @@ La base baseAllHosp contient les données d'incidence journalière d'hospitalisa
 
 ```{r sumByMonthParis, solution = TRUE}
 
+URL <- "https://www.data.gouv.fr/fr/datasets/r/6fadff46-9efd-4c53-942a-54aca783c30c"
+
+# data provenant de data.gouv.fr
+baseAllHosp <- read.csv(URL, sep = ";")
+
+# transformation des données
 baseAllHosp$mois <- format(baseAllHosp$date, "%Y-%m")
 
 sumByMonthParis <- aggregate(baseAllHosp$incid_hosp[baseAllHosp$dep == "75"], 
           by = list(mois = baseAllHosp$mois[baseAllHosp$dep == "75"]), 
           FUN = sum)
-
-
 
 ```
 
@@ -198,7 +197,11 @@ dplyr::inner_join(sumByMonthParis, sumByMonthIDF, by = "mois") |>
 
 ```
 
-## Cartographier les données
+## Cartographier des données
+
+Les outils de cartographie sont de plus en plus utilisés en science des données. 
+
+Dans le logiciel *R* il existe plusieurs modules pour la représentation cartographique comme *ggmap*, *maps*
 
 https://rgeomatic.hypotheses.org/category/cartography
 
@@ -223,13 +226,24 @@ FrMap_incidence <- full_join( FrMap, sumByMonthDept, by="code_insee" )
 ```
 
 
-```{r}
+
+```{r, echo=TRUE, eval=FALSE}
 incidence_mars2021 <- FrMap_incidence %>% 
   dplyr::filter(mois == "2021-03")
 
 mf_map(x = incidence_mars2021, var = "incidence", type = "choro")
+```
 
 
+```{r, solution = TRUE}
+incidence_mars2021 <- FrMap_incidence %>% 
+  dplyr::filter(mois == "2021-03")
+
+mf_map(x = incidence_mars2021, var = "incidence", type = "choro")
+```
+
+
+```{r sans ultra-marin, solution = TRUE}
 ultra_marin <- grep("^97", incidence_mars2021$code_insee)
 incidence_mars2021_metro <- incidence_mars2021[- ultra_marin, ]
 mf_map(x = incidence_mars2021_metro, var = "incidence", type = "choro")
