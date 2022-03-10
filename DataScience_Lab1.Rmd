@@ -3,11 +3,11 @@ title: "Science des Données - Lab 1"
 author: "Nolwenn Le Meur & Pascal Crépey"
 date: '`r format(Sys.time(), "%d %B, %Y")`'
 output:
+  unilur::tutorial_html_solution: default
+  unilur::answer_rmd: default
   unilur::tutorial_pdf_solution:
     number_sections: true
     toc: true
-  unilur::answer_rmd: default
-  unilur::tutorial_html_solution: default
   unilur::tutorial_pdf: 
     number_sections: true
     toc: true
@@ -65,7 +65,7 @@ Pour utiliser ces modules dans une de vos sessions, vous devez les charger avec 
 
 **Chargez les packages.**
 
-```{r installpackage, solution = TRUE, eval = FALSE}
+```{r load library, solution = TRUE, eval = FALSE}
 
 library("readxl")
 library("data.table")
@@ -448,3 +448,7 @@ saveRDS(baseLong, file = "baseLong.rds")
 saveRDS(baseAllHosp, file = "baseAllHosp.rds")
 
 ``` 
+
+## Exploration des données
+
+Les outils EDA

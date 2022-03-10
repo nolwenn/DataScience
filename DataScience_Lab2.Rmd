@@ -7,10 +7,10 @@ output:
     number_sections: true
     toc: true
   unilur::answer_rmd: default
-  unilur::tutorial_html_solution: default
   unilur::tutorial_pdf: 
     number_sections: true
     toc: true
+  unilur::tutorial_html_solution: default
   unilur::tutorial_html: default
 ---
 
@@ -20,6 +20,7 @@ library(data.table)
 library(ggplot2)
 library(readxl)
 library(flextable)
+library(dplyr)
 theme_set(theme_minimal())
 set_flextable_defaults(fonts_ignore=TRUE)
 
@@ -53,7 +54,7 @@ Le paramètre `frequency` précise le nombre d'observations dans une période (i
 
 **Utilisez la fonction `ts()` pour créer une variable `hospit_ts` qui contiendra une série temporelle des hospitalisations avec une fenêtre hebdomadaire à partir de `baseLong`.**
 
-```{r ts}
+```{r ts, solution = TRUE}
 
 baseH <- baseLong[baseLong$type=="hospitalisation",]
 myts <- ts(baseH$valeur, 
@@ -76,7 +77,7 @@ plot(mydec)
 # Visualiser une série temporelle avec ggplot
 *Utilisez `ggplot`pour visualisez ces composantes sur un même graphique*
 
-```{r ggplotmydec}
+```{r ggplotmydec, eval=FALSE}
 
 baseH$tendance <- as.numeric(mydec$trend)
 baseH$residu <- as.numeric(mydec$random)
@@ -134,11 +135,12 @@ Pour réaliser une moyenne glissante, vous pouvez utiliser des fonctions disponi
 *Utilisez `rollmean` pour calculer des moyennes glissantes avec des fenêtre de 7 jours ou de 30 jours. Visualisez les résultats et comparez aux résultats précédents.*
 
 ```{r rollmean, solution = TRUE}
+library(zoo)
 
-baseLongRmean = baseLong %>% group_by(type) %>% 
+baseLongRmean <- baseLong %>% group_by(type) %>% 
   mutate(valeurM7 = rollmean(x = valeur, k = 7, fill = 0))
 
-baseLongRmean = baseLongRmean %>% group_by(type) %>% 
+baseLongRmean <- baseLongRmean %>% group_by(type) %>% 
   mutate(valeurM30 = rollmean(x = valeur, k = 30, fill = 0))
 
 ggplot(baseLongRmean, aes(x = date, linetype = type)) +
@@ -187,12 +189,12 @@ Présentez les deux séries dans le même tableau. Vous pouvez rendre vos tablea
 
 **Rendre le tableau présentable avec flextable.**
 
-```{r flextable}
+```{r flextable, eval=FALSE}
 
-dplyr::inner_join(sumByMonthParis, sumByMonthIDF, by = "mois") |>
-  flextable() |> 
-  delete_part(part = "header") |> 
-  add_header( mois = "Mois", x.x="Paris", x.y="IdF") |>
+dplyr::inner_join(sumByMonthParis, sumByMonthIDF, by = "mois") %>%
+  flextable() %>%
+  delete_part(part = "header") %>%
+  add_header( mois = "Mois", x.x="Paris", x.y="IdF") %>%
   theme_booktabs()
 
 ```
@@ -201,25 +203,27 @@ dplyr::inner_join(sumByMonthParis, sumByMonthIDF, by = "mois") |>
 
 Les outils de cartographie sont de plus en plus utilisés en science des données. 
 
-Dans le logiciel *R* il existe plusieurs modules pour la représentation cartographique comme *ggmap*, *maps*
+Dans le logiciel *R* il existe de nombreux modules pour la représentation cartographique comme *ggmap*, *maps* ou *mapsf*. Pour une vue d'ensemble des lodumes disponibles sur CRAN vous pouve consulter la *Task View* associée (	https://CRAN.R-project.org/view=Spatial). 
 
-https://rgeomatic.hypotheses.org/category/cartography
+Dans cet atelier nous vous proposons un exemple d'utilisation de [*mapsf*](https://rgeomatic.hypotheses.org/category/cartography).
 
-```{r}
+
+```{r, eval=FALSE}
 sumByMonthDept <- aggregate(baseAllHosp$incid_hosp, 
           by = list(mois = baseAllHosp$mois, code_insee = baseAllHosp$dep), 
           FUN = sum)
 names(sumByMonthDept)[3] <- "incidence"
 ```
 
-```{r}
+```{r, eval=FALSE}
 
 # Charger les libraries utiles
 library(sf)
 library(mapsf)
 
 # Lire le fichier shape pour la France
-FrMap <- st_read(dsn="departements-2017/.",  layer="DEPARTEMENT", quiet = TRUE)
+FrMap <- st_read(dsn="departements-2017/.", quiet = TRUE)
+FrMap$code_insee[FrMap$code_insee=="69D"] <- "69"
 
 # Jointure avec les taux d'incidence
 FrMap_incidence <- full_join( FrMap, sumByMonthDept, by="code_insee" )
@@ -235,18 +239,34 @@ mf_map(x = incidence_mars2021, var = "incidence", type = "choro")
 ```
 
 
-```{r, solution = TRUE}
-incidence_mars2021 <- FrMap_incidence %>% 
-  dplyr::filter(mois == "2021-03")
+```{r, solution = TRUE, eval=FALSE}
+incidence_oct2021 <- FrMap_incidence %>% 
+  dplyr::filter(mois == "2021-10")
+```
 
-mf_map(x = incidence_mars2021, var = "incidence", type = "choro")
+```{r, solution = TRUE, eval=FALSE}
+mf_map(x = incidence_oct2021, 
+       var = "incidence", 
+       type = "choro",  
+       nbreaks=6, 
+       breaks = "jenks")
 ```
 
 
-```{r sans ultra-marin, solution = TRUE}
-ultra_marin <- grep("^97", incidence_mars2021$code_insee)
-incidence_mars2021_metro <- incidence_mars2021[- ultra_marin, ]
-mf_map(x = incidence_mars2021_metro, var = "incidence", type = "choro")
+```{r sans ultra-marin, solution = TRUE, eval=FALSE}
+
+ultra_marin <- grep("^97", incidence_oct2021$code_insee)
+incidence_oct2021_metro <- incidence_oct2021[- ultra_marin, ]
+
+mf_map(x = incidence_oct2021_metro, 
+       var = "incidence", 
+       type = "choro", 
+       nbreaks=6, 
+       breaks = "jenks",
+       leg_val_rnd= 0,
+       col = "brown4",
+       leg_pos = "bottomleft2",  
+       leg_title = "Incidence \n pour 100 000 pers.")
 
 ```
 
