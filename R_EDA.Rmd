@@ -1,0 +1,50 @@
+---
+title: "Exploratory Data Analysis ou Data profiling"
+output:
+  pdf_document:
+    toc: yes
+  html_notebook:
+    toc: yes
+editor_options:
+  chunk_output_type: inline
+---
+
+# Définition
+
+L'objectif principal de l'analyse exploratoire (EDA) ou *data profiling* est d'examiner les données pour la distribution, les valeurs aberrantes et les anomalies afin de diriger des tests spécifiques de votre hypothèse. Il fournit également des outils pour la génération d'hypothèses en visualisant et en comprenant les données, généralement par le biais d'une représentation graphique. C'est une étape essentielle de toute analyse de recherche.
+
+# Enjeux
+
+- Identifier les types de données, leur longueur et des modèles récurrents.
+- Découvrir les métadonnées et évaluer leur exactitude.
+- Etiquetter des données avec des mots-clés, des descriptions ou des catégories.
+- Effectuer une évaluation de la qualité des données (données manquantes, distributions)
+ - Calculer de statistiques descriptives (min, max, compte, somme).
+- Identifier les distributions, les candidats clés, les candidats clés étrangères, les dépendances fonctionnelles, les dépendances de valeur intégrée et effectuer une analyse inter-tables.
+
+Dans le but de : 
+
+- Gérer la qualité des données (ex éliminer ou imputer des données manquantes)
+- Recodage de variables
+- Générer des hypothèses sans *a priori*
+
+# Outils
+
+## Avec R
+
+Packages R
+[The Landscape of R Packages for
+Automated Exploratory Data Analysis (Staniak and Biecek, 2019)]( https://journal.r-project.org/archive/2019/RJ-2019-033/RJ-2019-033.pdf)
+
+Exemple de DataExplorer (Boxuan Cui)
+
+
+## Autres outils
+
+- [White Rabbit](https://www.ohdsi.org/analytic-tools/whiterabbit-for-etl-design/)
+- [Orange](https://orangedatamining.com/)
+- [Knime](https://www.knime.com/)
+- Aggregate Profiler
+- DataCleaner
+- Pandas (Python)
+- Talend Open Studio for Data Quality

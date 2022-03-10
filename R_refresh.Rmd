@@ -1,0 +1,167 @@
+---
+title: "R refresh"
+output: 
+  html_notebook:
+   toc: yes
+editor_options: 
+  chunk_output_type: inline
+---
+
+Ceci est un petit rappel sur [R](https://cran.r-project.org) et son environement utilisateur ou GUI [RStudio](https://rstudio.org).
+
+# Le mode Projet
+
+ https://www.book.utilitr.org/rproject.html
+ 
+ https://support.rstudio.com/hc/en-us/articles/200526207-Using-RStudio-Projects
+ 
+ 
+### Pourquoi?
+
+A utiliser quasi systématiquement, les projets RStudio sont indispensables pour:
+
+- rendre les **traitements reproductibles** (centralise et organise l'interaction entre les fichiers)
+- assurer le **suivi** de modification, le contrôle de version
+
+
+La portabilité est renforcée le **répertoire de travail (working directory) par défaut d’un projet est le dossier où se situe le fichier .Rproj**. Cela rend les scripts indépendants de l’arborescence de la machine. Ainsi, si vous avez un code traitement.R situé dans le même dossier que le fichier .Rproj, alors le chemin de ce code est ./traitement.R, où que soit situé le dossier du projet.
+
+**Note:**
+Désactiver la sauvegarde du .RData à la fermeture du projet. Pour ce faire, il faut aller dans Tools > Global Options et rester dans l’onglet General. Chercher Save workspace to .RData on exit:, et choisir l’option Never.
+
+### Comment?
+
+Il y a trois méthodes pour créer un projet RStudio :
+
+- Dans un nouveau dossier (New Directory) : Pour un projet tout nouveau.
+- Dans un dossier existant (Existing Directory) : Pour organiser des codes existants sous forme de projet.
+- Cloner un projet depuis un dépôt distant (Version Control)
+
+# Bonnes pratiques de codage
+
+https://www.datanovia.com/en/blog/r-coding-style-best-practices/
+
+### Pourquoi?
+
+- Une meilleure lisibilité du code, par vous même ou d'autres
+- Une meilleure maintenabilité, par vous même ou d'autres
+- Un respect des spécificités du langage utilisé, donc moins d'erreur
+- Une meilleure gestion des performances
+
+### Comment?
+
+- Toujours **commenter** son code. En R le commentaire c'est avec un **#**
+
+```{r, eval=FALSE}
+# Création d'un vecteur x de longueur 1 et de valeur 2
+x <- 2
+# Création d'un vecteur y de longueur 2 
+y <- c("a", "c")
+```
+
+- Adopter les régles de nommage de fichiers, fonctions et objects
+  - Noms explicitent, se terminant en *.R* pour les fichiers 
+  - avec "_" si long
+```{r, eval=FALSE}
+# Good
+fit_models.R
+utility_functions.R
+anxiety_scale <- c("faible", "moyen","fort")
+# Bad
+fit models.R
+foo.r
+anxietyScale <- c("faible", "moyen","fort")
+```
+
+- Structure des scripts
+  - liste les libraries et données en en-tête
+  - utiliser les symboles - et = pour afficher des sections de code
+```{r, eval=FALSE}
+# Load data and libraries ---------------------------
+
+# Plot data -----------------------------------------
+```
+
+
+- Ne pas faire des programmes trop longs
+- Ne pas mettre trop d'information sur une ligne 
+
+
+# Notions de librairies
+
+R possède de nombreuses fonctions par défaut mais R est modulaire. Il est souvent indispensable d'ajouter des *packages* téléchargeables de différentes plateformes comme [CRAN](https://cran.r-project.org/), [Bioconductor](https://www.bioconductor.org/), Github
+
+Pour installer les *packages* sur votre ordianteur, vous pouvez les télécharger l'environment R.
+```{r, eval=TRUE}
+# Installation de la dernière version de la librairie graphique ggplot2
+install.packages("ggplot2")
+```
+
+Une fois un package intallé sur votre ordinateur pour pouvoir utiliser ses fonctions vous devez le charger dans votre session R (et à chaque nouvelle session), en utlisant l'appel à fonction suivant:
+```{r, eval=TRUE}
+# Chargement des functions de la librarie ggplot2 dans votre session de travail
+library("ggplot2")
+```
+
+Pour connaître les librairies utilisées dans votre session R en cours:
+```{r, eval=TRUE}
+sessionInfo()
+```
+
+*Note*:
+Les informations fournies par la fonction *sessionInfo()* sont souvent nécessaire à communiquer lorsqu'on demande de l'aide sur les forums.
+
+# Navigation dans l’aide et cheatsheets
+
+```{r, eval=FALSE}
+# Accès à l'aide pour la fonction read.table()
+?read.table
+```
+
+- Les aide-mémoires ou Cheat Sheets
+
+Les sites faisant références
+
+ - http://rstudio.com
+ - https://stackoverflow.com/questions
+ - https://www.datanovia.com
+ 
+*Note:*
+ Pour aller plus vite, il existe de nombreux raccourcis clavier comme par exemple *Cmd+Shift+Enter* pour exécuter les lignes de code R sans (trop) lever le petit doigt :)
+ 
+# Les données
+
+## Lire des données
+
+**R est capable de lire les données de la plupart des formats**, y compris les fichiers créés dans d'autres packages statistiques. Que les données aient été préparées à l'aide d'Excel (au format CSV, XLSX ou TXT), SAS, Stata, SPSS ou autres, R peut lire et charger les données en mémoire.
+
+
+```{r, eval=FALSE}
+# Accès à l'aide pour la fonction read.table()
+?read.table
+```
+
+Pour les données volunimeuses vous pouvez utiliser *fread()* de la librairie **data.table**, optimisée pour les données en grande dimension.
+
+Sachez aussi que R peut encapsuler des commandes SQL pour faire du requêtage de base de données.
+
+
+**Note:**
+Vérifier la bonne lecture des données avec des petits appels à fonctions comme *dim()*, *str()*, *head()*, *tail()*, *summary()* -- Attention toutefois si elles sont de grandes dimensions.
+
+## Sauvegarder/Charger un fichier 
+
+R a également deux formats de données natifs : **Rdata** (parfois abrégé en Rda) et Rds. Ces formats sont utilisés lorsque les objets R sont enregistrés pour une utilisation ultérieure. Rdata est utilisé pour enregistrer plusieurs objets R, tandis que Rds est utilisé pour enregistrer un seul objet R. 
+
+```{r, eval=FALSE}
+# Sauvegarder les données
+save(drug_anxiety_clean, file="drug_anxiety_clean.Rdata")
+
+# Charger les données au format Rdata 
+load("drug_anxiety_clean.Rdata")
+```
+
+Il est aussi possible de créer des fichiers CVS ou TXT à partir des obejts R avec des appels aux fonctions de la famille *write.table()* (voir l'aide pour plus de détails)
+
+
+https://journal.r-project.org/archive/2019/RJ-2019-033/RJ-2019-033.pdf
