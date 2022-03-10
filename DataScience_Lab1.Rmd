@@ -214,7 +214,7 @@ baseHosp$date <- as.Date(baseHosp$jour)
 
 baseSC$date <- as.Date(baseSC$jour)
 
-baseAllHosp$date = as.Date(baseAllHosp$jour)
+baseAllHosp$date <- as.Date(baseAllHosp$jour)
 
 ```
 
@@ -248,9 +248,11 @@ baseHosp$hospit_category <- cut(baseHosp$hospitalisation,
                                labels= c("basse", "moyenne", "haute"))
 ```
 
-## Joindre deux bases
+## Joindre deux bases de données
 
-Il est souvent plus simple de travailler avec une seule base de donnée. Nous allons maintenant voir comment joindre les deux bases *baseHosp* et *baseSC*.
+Dans un projet Data Science, nous faisons souvent appel à plusieurs sources de données que nous sommes amenées à fusionner pour intégrer l'information.
+
+Nous allons maintenant voir comment joindre les deux bases *baseHosp* et *baseSC*.
 
 Il y a deux façons de joindre les 2 bases :
 
@@ -259,22 +261,22 @@ Il y a deux façons de joindre les 2 bases :
 
 ### Coller les colonnes
 
-Pour "coller" des colonnes à une base, nous pouvons utiliser la fonction `cbind()` (*c* pour column).
+Pour "coller" des colonnes à une base, nous pouvons utiliser la fonction `cbind()` (*c* pour *column*).
 
 ```{r join_col}
 
-baseWide = cbind(baseHosp, baseSC)
+baseWide <- cbind(baseHosp, baseSC)
 head(baseWide)
 
 ```
 
-Cependant, ce n'est pas exactement ce que nous souhaitons car nous avons collé toutes les colonnes de baseSC sur baseHosp, et nous avons donc des colonnes dupliquées, ce qui n'est pas souhaitable.
+Cependant, ce n'est pas exactement ce que nous souhaitons car nous avons collé toutes les colonnes de baseSC sur baseHosp, et nous avons donc des colonnes dupliquées, ce qui n'est pas utile et encombre la mémoire.
 
 **Collez les colonnes qui nous intéressent, en l'occurrence la seule colonne "soins_critiques".**
 
 ```{r join_col2, solution = TRUE, eval = TRUE}
 
-baseWide = cbind(baseHosp, baseSC$soins_critiques)
+baseWide <- cbind(baseHosp, baseSC$soins_critiques)
 head(baseWide)
 
 ```
@@ -285,13 +287,13 @@ Pour cela nous pourrions d'abord trier les colonnes de chaque base pour s'assure
 
 ### Réaliser une jointure
 
-Une jointure est, comme son nom l'indique, une façon de joindre deux bases, mais en fixant des conditions sur la façon de joindre les bases.
+Une jointure est, comme son nom l'indique, une façon de joindre deux bases, mais en fixant des conditions sur la façon de joindre les bases. On parle de **clés de jointures** (*foreign key*).
 
 Par exemple, cela peut nous permettre de spécifier que nous voulons "coller les colonnes", mais en s'assurant que les lignes correspondent à la même date dans les deux bases. Concrètement, la fonction de jointure va joindre les bases ligne par ligne, en appariant les dates identiques.
 
 Le package `dplyr` nous met à disposition tous les outils nécessaires pour réaliser tout type de jointure (c'est un peu le Brico Dépôt du data management).
 
-La fonction pour joindre deux bases est `inner_join()`.
+La fonction pour joindre deux bases sur la base ensembliste de leur **intersection** est `inner_join()`.
 
 ```{r inner_join}
 
@@ -324,9 +326,9 @@ head(baseWide)
 
 Cette dernière commande produit une erreur car les colonnes "jour" et "date" n'ont pas le type et donc ne peuvent pas être comparées pour joindre les bases.
 
-Dans notre cas, la jointure est facile car les deux ont exactement le même nombre de lignes et chaque date est unique. Dans le cas contraire, `dplyr` dispose des fonctions `left_join()`, `right_join()`, `full_join()`, selon ce que vous souhaitez faire comme jointure.
+Dans notre cas, la jointure est facile car les deux ont exactement le même nombre de lignes et chaque date est unique. Dans le cas contraire, `dplyr` dispose des fonctions `full_join()`, `left_join()`, `right_join()` selon ce que vous souhaitez garder l'entièreté des enregistrements des deux bases ou de l'une ou l'autre.
 
-Nous vous invitons à regarder les documentations de ces fonctions pour apprendre comment elles fonctionnent. Plus généralement, vous pouvez vous référer au très bon livre de Hadley Wickham, créateur de dplyr, ["R for Data Science"](https://r4ds.had.co.nz/).
+Nous vous invitons à regarder les documentations (aide et *Cheat Sheet*) de ces fonctions pour apprendre comment elles fonctionnent. Plus généralement, vous pouvez vous référer au très bon livre de Hadley Wickham, créateur de dplyr, ["R for Data Science"](https://r4ds.had.co.nz/).
 
 ### Joindre les lignes
 
@@ -358,8 +360,8 @@ Nous allons redonner le même nom de "valeur" aux colonnes "soins_critiques" et 
 
 ```{r rename_colonnes, solution = TRUE, eval = TRUE}
 
-names(baseHosp)[names(baseHosp) == "hospitalisation"] = "valeur"
-names(baseSC)[names(baseSC) == "soins_critiques"] = "valeur"
+names(baseHosp)[names(baseHosp) == "hospitalisation"] <- "valeur"
+names(baseSC)[names(baseSC) == "soins_critiques"] <- "valeur"
 
 ```
 
@@ -371,7 +373,7 @@ Pour supprimer une colonne, il suffit de lui attribuer la valeur spéciale "NULL
 
 ```{r remove_col, solution = TRUE, eval = TRUE}
 
-baseHosp$jour_semaine = NULL
+baseHosp$jour_semaine <- NULL
 
 ```
 
@@ -391,8 +393,8 @@ Il faut donc créer une variable dans chaque base qui permettra de les identifie
 
 ```{r hospitbasehosp, solution = TRUE, echo = TRUE}
 
-baseHosp$type = "hospitalisation"
-baseSC$type = "soins_critiques"
+baseHosp$type <- "hospitalisation"
+baseSC$type <- "soins_critiques"
 
 ```
 
@@ -420,11 +422,11 @@ Nous pouvons finalement joindre les deux bases verticalement avec la fonction `r
 
 Par convention, on dira que la base jointe est au format "long".
 
-**Joignez les deux bases au format "long.**
+**Joignez les deux bases au format long.**
 
 ```{r, rbind, solution = TRUE, echo = TRUE}
 
-baseLong = rbind(baseHosp, baseSC)
+baseLong <- rbind(baseHosp, baseSC)
 
 ```
 

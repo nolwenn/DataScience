@@ -1,7 +1,6 @@
 ---
-title: "Analyse de données médico-administratives avec R: Exploration des données Open ccam de Scan Santé"
-author: "Nolwenn Le Meur - EHESP"
-lang: fr
+title: "Science des Données - Lab 2"
+author: "Nolwenn Le Meur & Pascal Crépey"
 date: '`r format(Sys.time(), "%d %B, %Y")`'
 output:
   unilur::tutorial_pdf_solution:
@@ -15,472 +14,225 @@ output:
   unilur::tutorial_html: default
 ---
 
-```{r include=FALSE}
-knitr::opts_chunk$set(eval=T, echo=T)
-solution <- T
-library(DataExplorer)
-library(tidyverse)
-```
-
-Vous vous intéressez aux durées moyennes de séjours (DMS) pour les interventions endovasculaires  de revascularisations des membres inférieures qui peuvent être effectués en ambulatoire ou en chirurgie conventionnelle.
-
-Vous disposez d'un premier d'un jeu données qui liste par établissements de soins les actes réalisés en France en 2020, le nombre d'actes, la DMS, l'activité ambulatoire, le département et la région. Ces données sont issues de Scan sante et librement disponibles sur https://www.scansante.fr/open-ccam/open-ccam-2020
-
-Vous disposez d'un second fichier qui liste les actes CCAM pratiqués pour la revascularisation endovasculaire.
-
-## I. Data Profiling
-
-Dans un premier temps, il vous est demandé de lire les données, de vérifier leur qualité et de sélectionner votre population d'intérêt.
-
-a. Lire le fichier *"Open_ccam_20.csv"* avec la fonction *read.csv()* dans R pour créer l'objet R *ccam20* et vérifiez le type des variables. Attention les variables sont séparées pas des ";" et  les données "manquantes" sont notées "." .
-```{r Ia, solution=TRUE}
-## Lecture des fichiers
-ccam20 <- read.csv("Open_ccam_20.csv", header=T, sep=";", na.strings = ".", dec=",")
-
-## avec la library data.table
-# library(data.table)
-# ccam20 <- fread("Open_ccam_20.csv")
-```
-
-
-b. Utiliser quelques fonctions de  la librarie *dataExplorer* pour un premier état des lieux
-```{r, solution = TRUE}
-
-# Types de variables et volume de données
-introduce(ccam20)
-plot_intro(ccam20)
-
-# Distribution des données manquantes
-plot_missing(ccam20)
-
-# Distribution des modalités des données catégorielles
-#plot_bar(ccam20)
-
-# Distribution des données continues
-plot_histogram(ccam20)
-```
-
-
-Le code *FinessGeo* est l'identifiant des établisssements de soins français. Il doit être de longueur 9 et les 2 premiers nombres qualifient le département français où est localisé l'établissement.
-
-Dans la base de données vérifiez que vous avez le bon format pour cet identifiant en utilisant la fonction *nchar()*.
-
-```{r, solution=TRUE}
-# table de contingence des longueurs de chaîne pour le code FinessGeo
-table(nchar(ccam20$FinessGeo))
-```
-
-c. Que font les lignes de codes ci-dessous? Executez les pas à pas pour comprendre.
-```{r c, echo=T}
-
-# FinessGeo sur 8 caractères vers 9 - ajout 0 devant
-ccam20$FinessGeo<- ifelse(nchar(ccam20$FinessGeo)==8, 
-                        paste("0",ccam20$FinessGeo,sep=""), 
-                        ccam20$FinessGeo)
-
-```
-
-c. Vous devez maintenant lire le fichier "liste_ccam2020.csv" (séparateur de colonnes ","),  sélectionner dans l'objet *ccam20* les lignes correspondant aux actes endovasculaires et créer une sous table *endo*
-```{r Ic, message=FALSE}
-# lecteur des actes endovasculaires d'intérêt
-ccam_endo <- read.csv("liste_ccam2020.csv", sep=",")
-# Sélection des actes endovasculaires
-endo <- ccam20[ccam20$acte%in%ccam_endo$CDC_ACT, ]
-# endo <- ccam20[ccam20$acte%in%ccam_endo[,1], ]
-
-## Avec la fonction subset
-# endo <- subset(ccam20, ccam20$acte%in%ccam_endo$CDC_ACT)
-
-## Avec la fonction filter de la librairie dplyr 
-library(dplyr)
-endo <- ccam20 %>% subset(acte%in%ccam_endo$CDC_ACT)
-```
-
-
-d. Sauvegarder cette nouvelle base de donnée au format Rdata
-```{r Id, eval=F}
-save(endo, file="endovasculaire_20.Rdata" )
-```
-
-
-## II. Statistiques descriptives 
-
-
-Si votre base de données *endo* n'est pas chargée dans votre environemment, vous devez l'importer avec la fonction *load()*.
-```{r, eval=F}
-load("endovasculaire_20.Rdata")
-```
-
-
-### 1. Quels établissements sont au-dessus de la DMS moyenne nationale?
-a. Calculez les indicateurs statistiques usuels pour la DMS en utilisant la fonction *summary()* et la fonction *ci()* de la library *epiDisplay*. Commentez les résultats.
-```{r II1a, message=FALSE}
-# Affiche d'un premier niveau de résumé statistique
-summary(endo$dms_globale)
-# charger la library epiDisplay et ses fonctions
-library(epiDisplay)
-# calcul de intervalle de confiance sur la DMS
-endoci <- ci(endo$dms_globale)
-endoci
-```
-
-b. Il existe de nombreuses données manquantes pour la DMS. Nous allons imputer les DMS manquantes grâce à la fonction *mice()* du *package mice*. Le package doit être installer si vous l'avez pas déjà fait. Que font les lignes de commande ci-dessous?
-```{r II1b, echo=T}
-# Comme c'était une erreur de lecture de fichier qui introduisait les NA 
-# et que cette erreur est corrigée, nous n'avons plus de NA
-# Aussi juste pour l'exercice et illustrer l'utilisation de la librarie mice
-# j'ajoute une variable dms_missing avec des données manquantes 
-endo$dms_missing <- endo$dms_globale
-idx<- sample(1:1806, 35, replace = F) # génération aléatoire d'une position dans le vecteur
-endo$dms_missing[idx] <- NA #remplacement des valeurs aux positions idx par NA
-
-library(mice)
-imp<- mice(endo[,-c(6,7,8)])
-imp<- complete(imp)
-endo$dms_missing<- imp$dms_missing
-# et nous pourrions continuer l'analyse avec endo$dms_missing
- ci(endo$dms_missing)
-```
-
-c. Calculez les indicateurs statistiques usuels pour la dms par région en utilisant la fonction *by()*.
-```{r II1c}
-# utilisation de la fonction by pour l'affichage de résumés stat par région
-by(endo$dms_globale, endo$reg, summary)
-# avec dplyr
-# endo %>% group_by(reg) %>% summarise("Moyenne"= mean(dms_globale, na.rm=T))
-```
-
-d. En utilisant la fonction *ifelse()* créez une variable binaire *Top* dans le table *endo* avec la modalité 1 lorsque l'établissement a une dms supérieure à la borne supérieure de l'intervalle de confiance de la moyenne  nationale de la dms et 0 autrement. 
-```{r II1d}
-# par indexation
-endo$Top <- 0
-endo$Top[endo$dms_globale > endoci$upper95ci] <- 1
-# avec ifelse
-endo$Top <- ifelse(endo$dms_globale > endoci$upper95ci, 1, 0)
-
-## Si pas accès à epiDisplay et utilisation de la moyenne des DMS
-# endo$Top <- ifelse(endo$dms_globale > mean(endo$dms_globale, na.rm=TRUE), 1, 0)
-## ou
-# endo$Top[endo$dms_globale > mean(endo$dms_globale, na.rm=T)] <- 1
-## ou
-# endo[endo$dms_globale > mean(endo$dms_globale, na.rm=T), "Top"] <- 1
-```
-
-e. Avec la function *table()* créer la table de contingence  qui dénombre les établissements au-dessus la borne supérieure de l'intervalle de confiance de la DMS nationale dans chaque région.
-```{r II1e}
-## Si 1 acte - 1 hôpital par rapport à la dms nationale
-table(endo$Top, endo$reg)
-
-## Si n actes par hôpital
-meanbyfiness <- endo %>% group_by(FinessGeo, reg) %>% 
-  summarise("mean_etab"= mean(dms_globale, na.rm=T))
-## ou on converse la table d'origine et ajoute d'un colonne mean_etab
-## où la moyenne est répété pour chaque établissement
-meanbyfiness2 <- endo %>% group_by(FinessGeo) %>% 
-  mutate("mean_etab"= mean(dms_globale, na.rm=T))
-## si que des NAs dans dms_globale pour 1 hôpital 
-# meanbyfiness <- meanbyfiness[meanbyfiness$mean!="NaN",]
-
-# ligne unique par établissement unique
-# library base R (default) dmsFiness2 <- unique(meanbyfiness2[,c("FinessGeo", "reg", "mean_etab")])
-# méthode dplyr
-dmsFiness <- distinct(meanbyfiness2[,c("FinessGeo", "reg","mean_etab")])
-
-# nouveau calcul de la dms national et de l'intervalle de confiance
-cinat<- ci(meanbyfiness$mean_etab)
-# nouvelle variable TOP
-meanbyfiness$Top <- ifelse(meanbyfiness$mean_etab > cinat$upper95ci, 1, 0)
-table(meanbyfiness$Top, meanbyfiness$reg)
-```
-
-f. Utilisez la fonction *prop.table()* pour obtenir la proportion de ces établissements par région.
-```{r II1f}
-## proportion par région
-round(prop.table(table(endo$Top, endo$reg), margin = 2)*100,2)
-```
-
-### 2. Quel est le mode de financement des établissements qui dépassent la DMS nationale pour les actes endovasculaires?
-
-Pour obtenir le mode de financement des hopitaux (mft - mode fixation tarifs) nous devons apparier nos données CCAM aux données du répertoire Finess. Ces informations sont librement disponibles sur le site Open-data.gov. 
-
-(source: https://www.data.gouv.fr/fr/datasets/finess-extraction-du-fichier-des-etablissements/)
-
-a. Lire le fichier *"etalab_stock_et_20201231.csv"* dans R pour créer l'objet R *finess* et vérifiez le type de la variable mft.
-```{r II2a, echo=FALSE}
-## Lire le fichier finess
-finess <- read.csv("etalab_stock_et_20201231.csv", header=T, sep=";")
-## Transformation de la variable mft en type factor
-finess$mft <- as.factor(finess$mft)
-```
-
-b. Appariez les données CCAM pour les actes endovasculaires aux données Finess (variables  *nofinesset* et *mft* uniquement) dans un objet nommé *endofiness* grâce à la fonction *merge()*.
-```{r II2b}
-## Si problème longueur code finess à 8 et non 9 (premier 0 non lu)
-summary(nchar(endo$FinessGeo))
-endo$FinessGeo<- ifelse(nchar(endo$FinessGeo)==8, 
-                        paste("0",endo$FinessGeo,sep=""), endo$FinessGeo)
-summary(nchar(endo$FinessGeo))
-
-## Jointure entre base avec clé de jointure de nom différent
-## Si les 2 clés de jointures ont le même nom pas besoin de by.x et by.y mais juste by 
-endofiness <- merge(endo, finess[, c("nofinesset", "mft")], by.x="FinessGeo",by.y="nofinesset", all.x=TRUE, all.y=FALSE)
-## colnames(endofiness)
-
-## Avec dplyr
-# endofiness <- left_join(endo, finess[, c("nofinesset", "mft")], by=c("FinessGeo"=="nofinesset"))
-
-```
-
-c. Que fait le code chunk suivant?
-```{r II2c, echo=TRUE, results=FALSE}
-# useNA = "always pour visualiser si il y a de NA
-table(endofiness$mft, useNA = "always")
-# Pour enlever les levels inutiles
-levels(endofiness$mft)
-levels(endofiness$mft)[table(endofiness$mft)==0 ] <- NA
-levels(endofiness$mft)
-
-table(endofiness$mft, useNA = "always")
-endofiness$mft <- factor(endofiness$mft, 
-                            labels=c("public", "public","non lucratif", "privé",
-                                     "non lucratif", "privé",
-                                     "public","privé","indéterminé"))
-```
-
-```{r II2c-correc}
-# Table de contingence de la variable mode de paiement
-# Si table de contingence retourne des modalités à 0 on les retire en les forçant à NA
-# Table de contingence de la variable mode de paiement sans les O
-# Ajouter les labels (étiquettes) à la variable mft
-```
-
-
-d. Utilisez les fonctions *table* et *prop.table()* pour obtenir le dénombrement et la proportion des établissements au-dessus de la DMS nationale (variable *Top*) par type de financements (variable *mft*).
-```{r II2d}
-## Proportion avec total colonne=100
-prop.table(table(endofiness$Top, endofiness$mft), 2)*100
-## Proportion avec total ligne=100
-prop.table(table(endofiness$Top, endofiness$mft), 1)*100
-```
-
-
-### 3. Est-ce que les établissements dépassant la dms nationale pour les actes endovasculaires proposent aussi cette intervention en ambulatoire?
-
-a. Créez une variable binaire *Ambu* dans le table *endofiness* avec la modalité 1 lorsque l'établissement présente des informations dans la variable *nb_sej_0_nuit* et 0 autrement.
-```{r II3a}
-# Création de vecteur de 0
-endofiness$Ambu <- 0
-# Remplacement des 0 par 1 si dans colonne nb_sej_0_nuit j'ai une valeur (pas de na !is.na() )
-endofiness$Ambu[!is.na(endofiness$nb_sej_0_nuit)] <- 1
-
-## Si je n'ai pas de NA ( !is.na() ) alors 1 sinon 0
-# endofiness$Ambu <- ifelse(!is.na(endofiness$nb_sej_0_nuit), 1, 0)
-## Si j'ai des NA alors 0 sinon 1 (avec étiquette)
-# endofiness$Ambu <- ifelse(is.na(endofiness$nb_sej_0_nuit), "pas ambu", "ambu")
-#endofiness$Ambu <- as.factor(endofiness$Ambu)
-```
-
-b. Utilisez les fonctions *table* et *prop.table()* pour obtenir le dénombrement et la proportion des établissements au-dessus de la DMS nationale (variable *Top*) selon la présence ou nom d'une activité ambulatoire pour l'acte.
-```{r II3b}
-endofiness$Top <- factor(endofiness$Top, levels=c(0,1),
-                            labels=c("dms", "sup dms"))
-tabTopAmbu <- table("Dépassement"=endofiness$Top,
-                    "Ambulatoire"=endofiness$Ambu)
-tabTopAmbu
-prop.table(tabTopAmbu, 1)*100
-```
-
-
-## III. Statistiques inferentielles 
-
-### 1. Analyses univariées
-
-a. Réalisez un test de Chi2 ou un test Exact de Fisher pour tester l'hypothèse d'indépendence entre dépassement de la DMS nationale et la pratique de cette intervention en ambulatoire.
-
-```{r III1a}
-chisq.test(tabTopAmbu)
-chisq.test(endofiness$Top, endofiness$Ambu)
-
-fisher.test(tabTopAmbu)
-fisher.test(endofiness$Top, endofiness$Ambu)
-```
-
-Vous demandez si la DMS des établissements est fonction de l'activité *nb_actes*?
-
-b. Créer la variable binaire *nbactes_eleve* sur la base de la médiane de la distribution des *nb_actes* des établissements.
-```{r III1b}
-summary(endofiness$nb_actes)
-med_acte <- median(endofiness$nb_actes)
-endofiness$nbactes_eleve <- ifelse(endofiness$nb_actes > median(endofiness$nb_actes), 1, 0)
-#endofiness$nbactes_eleve <- ifelse(endo$nb_actes > med_acte, 1, 0)
-#endofiness$nbactes_eleve <- ifelse(endo$nb_actes > statdesc["Median"], 1, 0)
-```
-
-c. Calculer les indicateurs statistiques usuels pour la DMS selon la variable *nbactes_eleve*.
-```{r III1c}
-by(endofiness$dms_globale, endofiness$nbactes_eleve, ci)
-```
-
-d. Tester l'hypothèse de l'indépendence entre la DMS et un nombre d'actes élevés avec le test statistique adapté. Interpréter les résultats.
-```{r III1d}
-by(endofiness$dms_globale, endofiness$nbactes_eleve, shapiro.test)
-wilcox.test(endofiness$dms_globale ~ endofiness$nbactes_eleve)
-```
-
-### 2. ANOVA and Co
-
-Vous vous interrogez ensuite sur l'existence de différences de DMS entre établissements aux modes de financements différents.
-
-a. Calculez la moyenne des DMS par mode de financements.
-```{r III2a}
-by(endofiness$dms_globale,  endofiness$mft, mean)
-```
-
-b. Appliquez le test statistique adapté pour explorer l'hypothèse d'une indépendence entre mode de financement et DMS.
-```{r III2b}
-# Analyse non paramétrique
-kruskal.test(dms_globale ~ mft, data=endofiness)
-boxplot(dms_globale ~ mft, data=endofiness)
-
-# ANOVA -  Tukey HSD test même si méthodologiquement très limite
-aovmft <- aov(dms_globale ~ mft, data=endofiness)
-
-# vérification a posteriori de la validité de l'ANOVA
-plot(aovmft)
-summary(aovmft)
-TukeyHSD(aovmft)
-```
-
-```{r III2b bis, echo=F}
-# Si on retire les indterminés
-endofiness2 <- endofiness %>% filter(mft !="indéterminé")
-levels(endofiness2$mft)[4] <- NA
-
-# Analyse non paramétrique
-kruskal.test(dms_globale ~ mft, data=endofiness2)
-boxplot(dms_globale ~ mft, data=endofiness2)
-
-# ANOVA -  Tukey HSD test même si méthodologiquement très limite
-aovmft <- aov(dms_globale ~ mft, data=endofiness2)
-
-summary(aovmft)
-TukeyHSD(aovmft)
-```
-
-
-### 3. Régressions
-
-A partir de vos données uniquement, vous chercher ensuite à expliquer les raisons possibles d'un dépassement de la DMS nationale.
-
-a. Utilisez la méthode *glm()* pour réaliser une régression logistique et explorer les possibles liens entre DMS au dessus de la DMS nationale (variable *Top*) et les variables *nb_actes*, *mft*, *Ambu*.
-```{r III3a}
-## Changement de catégorie de référence pour la variable mft
-#endofiness$mft <- relevel(endofiness$mft, ref="privé")
-m1 <- glm(Top ~  nb_actes + mft + Ambu, data=endofiness, family = binomial())
-summary(m1)
-```
-
-b. Utilisez la fonction *logistic.display()* de la libary *epiDisplay* pour un affichage synthetique des OR.
-```{r III3b}
-logistic.display(m1, simplified = T)
-```
-
-
-## IV. Représentations graphiques et cartes
-
-**R** dispose de nombreuses fonctionnalités graphiques de base mais la libraire *ggplot2* s'impose aujourd'hui grâce à l'optimisation des paramètres pour un respect des règles du domaine de la visualusation.
-
-### 1. Graphiques 
-
-a. Utilisez la fonction *boxplot()* pour représenter les distributions des DMS par région avec des boîtes à moustaches 
-```{r IV1a, message=FALSE}
-boxplot(endo$dms_globale ~ endo$reg, xlab="région", ylab="DMS (en jours)")
-```
-
-b. Utilisez la library *ggplot2* fonction et la syntaxe graphique incluant *geom_boxplot()* pour représenter les distributions des DMS par région avec des boîtes à moustaches 
-```{r IV1b, message=FALSE}
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(data.table)
 library(ggplot2)
-ggplot(endo, aes(as.factor(reg),dms_globale)) + 
-  geom_boxplot(aes(group=reg)) + xlab("Regions") + ylab("DMS (jours)")
+library(readxl)
+library(flextable)
+theme_set(theme_minimal())
+set_flextable_defaults(fonts_ignore=TRUE)
+
+```
+
+# Chargez les données
+
+Commencez par charger les données que vous avez sauvegardées lors du précédent atelier. Si vous avez bien les fichiers "baseLong.rds" et "baseAllHosp.rds", **utilisez la fonction `readRDS()` pour les lire**.
+
+```{r readRDS, solution = TRUE}
+
+baseLong = readRDS("baseLong.rds")
+baseAllHosp = readRDS("baseAllHosp.rds")
 ```
 
 
-c. Représentez le nombre d'actes en fonction de la DMS avec la syntaxe graphique incluant *geom_point()*
-```{r IV1c}
-ggplot(endo, aes(x=nb_actes,  y=dms_globale)) + geom_point()
+# Créer une série temporelle à partir des données
+
+```{block}
+Pour pouvoir être décomposée, la série temporelle doit être d'abord transformée en un objet spécial avec la fonction `ts()` à partir des données. Cette fonction permet d'inclure l'échelle de temps de la mesure dans les données.
+
+Il faut cependant définir la période de temps qui vous intéresse. Cela se fait en définissant la fréquence d'échantillonage. Par exemple, si vous avez des données quotidiennes et que vous voulez définir la période de temps en semaine, alors vous indiquerez `frequency = 7`.
+
+Par exemple (si `x` contient les valeurs pour chaque pas de temps).
+ serie1 <- ts(x, frequency=7) 
+
+Le paramètre `frequency` précise le nombre d'observations dans une période (i.e: 7 pour de l'hebdomadaire, 30.5 pour du mensuel, etc).
+
+
+```
+
+**Utilisez la fonction `ts()` pour créer une variable `hospit_ts` qui contiendra une série temporelle des hospitalisations avec une fenêtre hebdomadaire à partir de `baseLong`.**
+
+```{r ts}
+
+baseH <- baseLong[baseLong$type=="hospitalisation",]
+myts <- ts(baseH$valeur, 
+          frequency = 7)
+
+```
+
+Cet objet `ts` est ensuite facilement exploitable par les outils de décomposition de séries temporelles. 
+
+*Utilisez la fonction `decompose()` pour extraire la tendance, la saisonalité hebdomadaire et le résidu. Vous pouvez directement utiliser la fonction `plot()` sur cette décomposition.*
+
+```{r decompose, solution = TRUE}
+
+mydec <- decompose(myts, type = "additive")
+
+plot(mydec)
+
+```
+
+# Visualiser une série temporelle avec ggplot
+*Utilisez `ggplot`pour visualisez ces composantes sur un même graphique*
+
+```{r ggplotmydec}
+
+baseH$tendance <- as.numeric(mydec$trend)
+baseH$residu <- as.numeric(mydec$random)
+baseH$saison <- as.numeric(mydec$seasonal)
+
+baseH$tendance <- as.numeric(mydec2$trend)
+baseH$residu <- as.numeric(mydec2$random)
+baseH$saison <- as.numeric(mydec2$seasonal)
+
+
+ggplot(data = baseH, aes(x = date)) +
+  geom_line(aes(y = tendance), color = "green") +
+  geom_line(aes(y = residu), color = "red") +
+  geom_line(aes(y = saison)) +
+  geom_line(aes(y = valeur), alpha = 0.5)
+
+```
+
+**Que concluez-vous ?**
+
+```{r, solution = TRUE}
+# les variations hebdomadaires sont négligeables par rapport à la tendance. Les variations "aléatoires" ne semblent pas l'être totalement et semblent être plus importante lors des phases d'incidence forte -> processus multiplicatifs plutôt qu'additif
+```
+
+## Changer l'agrégation temporelle
+
+Pour changer l'agrégation temporelle de jour à semaine ou mois, il suffit de créer une nouvelle variable correspondant à cette unité de temps puis de sommer les valeurs quotidiennes pour chacune des valeurs de cette variable.
+
+*Faites une agrégation par semaine et par mois.*
+
+```{r aggr, solution = TRUE}
+
+baseLong$mois <- format(baseLong$date, "%Y-%B")
+baseLong$semaine <- format(baseLong$date, "%Y-%V")
+
+baseLongAgg <- baseLong %>% group_by(mois, type) %>% mutate(valeur_mois = sum(valeur))
+
+baseLongAgg <- baseLongAgg %>% group_by(semaine, type) %>% mutate(valeur_semaine = sum(valeur))
+
+
+```
+
+*Visualisez graphiquement ces nouvelles valeurs.*
+
+```{r plotagg, solution  = TRUE}
+
+ggplot(baseLongAgg, aes(x = date, linetype = type)) +
+  geom_line(aes(y = valeur_mois), color = "green") +
+  geom_line(aes(y = valeur_semaine), color = "red") + 
+  scale_x_date(name = NULL) +
+  scale_y_continuous(name = "incidence")
+
+
+```
+
+## Faire une moyenne glissante
+
+Pour réaliser une moyenne glissante, vous pouvez utiliser des fonctions disponibles dans la librairie `zoo`, telle que `rollmean()`. L'argument k de cette fonction fixe la taille de la fenêtre. 
+
+*Utilisez `rollmean` pour calculer des moyennes glissantes avec des fenêtre de 7 jours ou de 30 jours. Visualisez les résultats et comparez aux résultats précédents.*
+
+```{r rollmean, solution = TRUE}
+
+baseLongRmean = baseLong %>% group_by(type) %>% 
+  mutate(valeurM7 = rollmean(x = valeur, k = 7, fill = 0))
+
+baseLongRmean = baseLongRmean %>% group_by(type) %>% 
+  mutate(valeurM30 = rollmean(x = valeur, k = 30, fill = 0))
+
+ggplot(baseLongRmean, aes(x = date, linetype = type)) +
+  geom_line(aes(y = valeur), color = "black")+
+  geom_line(aes(y = valeurM7), color = "red")+
+  geom_line(aes(y = valeurM30), color = "blue")+
+  scale_x_date(name = NULL) 
+
 ```
 
 
-d. Représentez le nombre d'actes en fonction de la DMS et colorez les points selon les statuts juridiques
-```{r IV1d}
-ggplot(endofiness, aes(x=nb_actes,  y=dms_globale, colour=mft))+ geom_point()
+# Réaliser des opérations et les présenter sous forme de tableau
+
+## Réaliser une opération sur un sous-ensemble de données
+
+La base baseAllHosp contient les données d'incidence journalière d'hospitalisation, de réanimation, de décès et de retour à domicile.
+
+**Faites la somme par mois du nombre de nouvelles hospitalisations sur Paris. Pensez à créer une variable  *mois*, et utilisez la fonction `aggregate()` pour calculer cette somme. **
+
+```{r sumByMonthParis, solution = TRUE}
+
+baseAllHosp$mois <- format(baseAllHosp$date, "%Y-%m")
+
+sumByMonthParis <- aggregate(baseAllHosp$incid_hosp[baseAllHosp$dep == "75"], 
+          by = list(mois = baseAllHosp$mois[baseAllHosp$dep == "75"]), 
+          FUN = sum)
+
+
+
 ```
 
-e. Utilisez une représentation en boîtes à moustaches pour représenter les distributions des DMS par région et par mode de financement en utilisant la syntaxe *facet_wrap()*
-```{r IV1e}
-p <- ggplot(endofiness, aes(y=dms_globale, x=reg)) + geom_boxplot(aes(group=reg)) 
-p + facet_wrap(.~ mft)
+**Faites la même chose pour l'Ile-de-France (departements: 75, 77, 78, 91, 92, 93, 94, 95) en utilisant l'opérateur `%in%` **
 
+```{r sumIdF, solution = TRUE}
+sumByMonthIDF = aggregate(baseAllHosp$incid_hosp[baseAllHosp$dep %in% c("75", "77", "78", "91", "92", "93" , "94", "95") ], 
+          by = list(mois = baseAllHosp$mois[baseAllHosp$dep %in% c("75", "77", "78", "91", "92", "93" , "94", "95")]), 
+          FUN = sum)
 
-p <- ggplot(endofiness, aes(y=dms_globale, x=mft)) + geom_boxplot(aes(group=mft)) 
-p + facet_wrap(.~ reg) +  
-  theme(axis.text.x = element_text(angle = 45))
 ```
 
-e. Représentez les distributions des DMS par mode de financement en utilisant *geom_density()*
-```{r IV1f}
-ggplot(endofiness, aes(dms_globale, group=as.factor(mft))) + 
-  geom_density(aes(fill=mft, alpha = 0.5))
+Présentez les deux séries dans le même tableau. Vous pouvez rendre vos tableaux plus présentable en installant le package flextable et en utilisant la fonction du même nom dans ce package. 
+
+**Rendre le tableau présentable avec flextable.**
+
+```{r flextable}
+
+dplyr::inner_join(sumByMonthParis, sumByMonthIDF, by = "mois") |>
+  flextable() |> 
+  delete_part(part = "header") |> 
+  add_header( mois = "Mois", x.x="Paris", x.y="IdF") |>
+  theme_booktabs()
+
 ```
 
-Extra: Diagramme en barre de la répartition des établissements selon leur mode  de financement
-```{r barplot }
-library(scales)  # pour l'échelle en pourcentage
-prop_mft<- endofiness %>% count(mft) %>% mutate(perc= n/nrow(endofiness))
-ggplot(prop_mft, aes(x = mft, y = perc)) + geom_bar(stat = "identity")+ scale_y_continuous(labels=scales::percent) 
+## Cartographier les données
+
+https://rgeomatic.hypotheses.org/category/cartography
+
+```{r}
+sumByMonthDept <- aggregate(baseAllHosp$incid_hosp, 
+          by = list(mois = baseAllHosp$mois, code_insee = baseAllHosp$dep), 
+          FUN = sum)
+names(sumByMonthDept)[3] <- "incidence"
+```
+
+```{r}
+
+# Charger les libraries utiles
+library(sf)
+library(mapsf)
+
+# Lire le fichier shape pour la France
+FrMap <- st_read(dsn="departements-2017/.",  layer="DEPARTEMENT", quiet = TRUE)
+
+# Jointure avec les taux d'incidence
+FrMap_incidence <- full_join( FrMap, sumByMonthDept, by="code_insee" )
 ```
 
 
-### 2. Cartes
+```{r}
+incidence_mars2021 <- FrMap_incidence %>% 
+  dplyr::filter(mois == "2021-03")
 
-Vous souhaitez représenter les DMS par région.
+mf_map(x = incidence_mars2021, var = "incidence", type = "choro")
 
-a. Calculez la moyenne des DMS par département et stocker le résultat sous la forme du data.frame du nom de *dmsdep*
-```{r IV2a}
-endofiness$dep <- factor(endofiness$dep)
-dmsdep <-  by(endofiness$dms_globale, endofiness$dep, mean, na.rm=T)
-dmsdep <- as.vector(dmsdep)
-dmsdep <- data.frame("dep"=levels(endofiness$dep), "dms"=dmsdep)
-# Avec dplyr
-dmsdep <- endofiness %>% group_by(dep) %>% summarise("dms" = mean(dms_globale, na.rm=T))
-```
 
-Pour construire une carte vous devez obtenir les coordonnées géographiques. Vous utilisez les library *ggmap* et *maps*.
+ultra_marin <- grep("^97", incidence_mars2021$code_insee)
+incidence_mars2021_metro <- incidence_mars2021[- ultra_marin, ]
+mf_map(x = incidence_mars2021_metro, var = "incidence", type = "choro")
 
-b. Installer et charger ces library dans R puis avec la fonction *map_data()* charger la carte de France dans un objet R nommé *france*
-```{r IV2b}
-library(ggmap)
-library(maps)
-france <- map_data("france")
-```
-
-c. Vous avez besoin de la correspondance entre les numéros de départements et leurs libellés disponibles dans le fichier *dep2reg.csv*. Lire le fichier dans R et nommer votre objet *dep2reg*.
-```{r IV2c}
-dep2reg <- read.csv("dep2reg.csv", header=T, sep=",")
-```
-
-d. Effectuer les jointures entre les tables *dmsdep* et *dep2reg* puis avec la table *france* pour créer l'objet *dmsdep2map*
-```{r IV2d}
-dmsdep <-  merge(dmsdep, dep2reg, by ="dep", all.y=T)
-dmsdep2map <- merge(france, dmsdep, by.x="region", by.y="label_dep", all.x=T)
-```
-
-e. Executer le code ci-dessous et commenter les résultats
-```{r IV2e, echo=TRUE, eval=FALSE}
-dmsdep2map <- dmsdep2map[order(dmsdep2map$order), ]
-ggplot(data = dmsdep2map) + 
-   geom_polygon(aes(x = long, y = lat, fill = dms, group = group)) + 
-  scale_fill_gradientn(colours =heat.colors(7, alpha=0.8, rev = T))
-   coord_fixed(1.3)
 ```
 
