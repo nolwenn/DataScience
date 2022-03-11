@@ -94,15 +94,16 @@ anxietyScale <- c("faible", "moyen","fort")
 R possède de nombreuses fonctions par défaut mais R est modulaire. Il est souvent indispensable d'ajouter des *packages* téléchargeables de différentes plateformes comme [CRAN](https://cran.r-project.org/), [Bioconductor](https://www.bioconductor.org/), Github
 
 Pour installer les *packages* sur votre ordianteur, vous pouvez les télécharger l'environment R.
-```{r, eval=TRUE}
+```{r, eval=FALSE}
 # Installation de la dernière version de la librairie graphique ggplot2
 install.packages("ggplot2")
 ```
 
 Une fois un package intallé sur votre ordinateur pour pouvoir utiliser ses fonctions vous devez le charger dans votre session R (et à chaque nouvelle session), en utlisant l'appel à fonction suivant:
-```{r, eval=TRUE}
+
+```{r, eval=FALSE}
 # Chargement des functions de la librarie ggplot2 dans votre session de travail
-library("ggplot2")
+library(ggplot2)
 ```
 
 Pour connaître les librairies utilisées dans votre session R en cours:

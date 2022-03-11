@@ -1,11 +1,14 @@
 ---
 title: "Data profiling"
 author: "Nolwenn Le Meur & Pascal Crépey"
-date: '`r format(Sys.time(), "%d %B, %Y")`'
+date: "`r format(Sys.time(), "%d %B, %Y")`"
 output:
-  pdf_document:
-    toc: yes
   html_notebook:
+    toc: yes
+  html_document:
+    toc: yes
+    df_print: paged
+  pdf_document:
     toc: yes
 editor_options:
   chunk_output_type: inline
