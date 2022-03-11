@@ -139,7 +139,7 @@ str(baseAllHosp)
 
 ```
 
-Lorsque vous importez des données dans R, vous pouvez aussi utiliser des *packages* développés pour le *Data Profiling* ou *l'analyse exploratoire (EDA)* qui proposent des fonctions pour la caractérisation et le contrôle qualité des données. 
+Lorsque vous importez des données dans R, vous pouvez aussi utiliser des *packages* développés pour le *Data Profiling* avand de vous lancez dans *l'analyse exploratoire (EDA)*. Ces outils proposent des fonctions pour la caractérisation et le contrôle qualité des variables d'une base de données. 
 
 Pour exemple, vous allez utliser quelques fonctions du *package DataExplorer*. 
 

@@ -32,8 +32,8 @@ Commencez par charger les données que vous avez sauvegardées lors du précéde
 
 ```{r readRDS, solution = TRUE}
 
-baseLong = readRDS("baseLong.rds")
-baseAllHosp = readRDS("baseAllHosp.rds")
+baseLong <- readRDS("baseLong.rds")
+baseAllHosp <- readRDS("baseAllHosp.rds")
 ```
 
 
