@@ -144,7 +144,7 @@ Les sites faisant références
 ?read.table
 ```
 
-Pour les données volunimeuses vous pouvez utiliser *fread()* de la librairie **data.table**, optimisée pour les données en grande dimension.
+Pour les données volumineuses vous pouvez utiliser *fread()* de la librairie **data.table**, optimisée pour les données en grande dimension.
 
 Sachez aussi que R peut encapsuler des commandes SQL pour faire du requêtage de base de données.
 
