@@ -47,6 +47,7 @@ Dans le cadre de cet atelier, nous aurons besoin des *packages* suivants:
 -   data.table
 -   dplyr
 -   ggplot2
+-   DataExplorer
 
 Si vous ne les avez jamais téléchargés sur votre ordinateur depuis votre dernière installation de R et RStudio, vous devez les télécharger depuis Internet. Cette installation n'est à faire qu'une seule fois sauf mises à jour de *R*, *RStudio* ou du *packages* lui-même.
 
@@ -58,6 +59,7 @@ install.packages("readxl")
 install.packages("data.table")
 install.packages("dplyr")
 install.packages("ggplot2")
+install.packages("DataExplorer")
 
 ```
 
@@ -71,6 +73,7 @@ library("readxl")
 library("data.table")
 library("dplyr")
 library("ggplot2")
+library("DataExplorer")
 
 ```
 
@@ -135,6 +138,39 @@ str(baseAllHosp)
 # La variable jour est de type character
 
 ```
+
+Lorsque vous importez des données dans R, vous pouvez aussi utiliser des *packages* développés pour le *Data Profiling* ou *l'analyse exploratoire (EDA)* qui proposent des fonctions pour la caractérisation et le contrôle qualité des données. 
+
+Pour exemple, vous allez utliser quelques fonctions du *package DataExplorer*. 
+
+**Explorer l'utilité des fonction *introduce()* et *plot_intro() sur la base baseAllHosp**
+
+```{r introduce, solution = TRUE}
+
+# Utilisation de DataExplorer pour premier QA
+introduce(baseAllHosp)
+plot_intro(baseAllHosp)
+
+# Nous n'avons pas de données manquantes 
+# mais si tel était le cas vous pourriez savoir dans quelles variables 
+# avec la fonction plot_missing()
+
+# Juste pour l'example ici nous remplacons les 0 par des NA
+baseAllHosp2 <- baseAllHosp
+baseAllHosp2[baseAllHosp2==0] <- NA
+plot_intro(baseAllHosp2)
+plot_missing(baseAllHosp2)
+```
+
+Il est souvent utile d'apprécier la distribution de vos variables quantitatives pour savoir si cela correspond bien à ce que vous attendiez.
+
+**Utliser la fonction *plot_histogram()* sur la base baseAllHosp**
+
+```{r introduce, solution = TRUE}
+plot_histogram(baseAllHosp)
+```
+
+Enfin, *DataExplorer* possède des fonctions similaires pour les variables qualitatives et explorer la corrélation entre variables.
 
 # Manipuler des variables
 
@@ -244,7 +280,7 @@ quantile(baseHosp$hospitalisation, probs = c(0, 0.33, 0.66, 1))
 
 ```{r cut, solution = TRUE, eval =FALSE}
 
-bornes = quantile(baseHosp$hospitalisation, probs = c(0, 0.33, 0.66, 1))
+bornes <- quantile(baseHosp$hospitalisation, probs = c(0, 0.33, 0.66, 1))
 
 baseHosp$hospit_category <- cut(baseHosp$hospitalisation, 
                                breaks = bornes, 
@@ -452,6 +488,3 @@ saveRDS(baseAllHosp, file = "baseAllHosp.rds")
 
 ```
 
-## Exploration des données
-
-Les outils EDA
