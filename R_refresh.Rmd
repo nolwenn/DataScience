@@ -154,7 +154,7 @@ Vérifier la bonne lecture des données avec des petits appels à fonctions comm
 
 ## Sauvegarder/Charger un fichier 
 
-R a également deux formats de données natifs : **Rdata** (parfois abrégé en Rda) et Rds. Ces formats sont utilisés lorsque les objets R sont enregistrés pour une utilisation ultérieure. Rdata est utilisé pour enregistrer plusieurs objets R, tandis que Rds est utilisé pour enregistrer un seul objet R. 
+R a également deux formats de données natifs : **Rdata** (parfois abrégé en Rda) et **rds**. Ces formats sont utilisés lorsque les objets R sont enregistrés pour une utilisation ultérieure. **Rdata** est utilisé pour enregistrer plusieurs objets R, tandis que **rds** est utilisé pour enregistrer un seul objet R. 
 
 ```{r, eval=FALSE}
 
@@ -169,4 +169,4 @@ saveRDS(drug_anxiety_clean, file = "drug_anxiety_clean.rds")
 readRDS("drug_anxiety_clean.rds")
 ```
 
-Il est aussi possible de créer des fichiers CVS ou TXT à partir des obejts R avec des appels aux fonctions de la famille *write.table()* (voir l'aide pour plus de détails)
+Il est aussi possible de créer des fichiers CSV ou TXT à partir des objets R avec des appels aux fonctions de la famille *write.table()* (voir l'aide pour plus de détails)

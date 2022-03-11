@@ -16,41 +16,41 @@ editor_options:
 
 # Définition
 
-L'objectif principal du *data profiling* est d'examiner la qualité des données comme la distribution des variables, la présence de valeurs aberrantes et autres anomalies afin de les nettoyer. C'est la première étape de l'analyse (exploratoire) de données ou *exploratory data analysis* (EDA).  Le *data profiling* peut aussi fournir des outils pour la génération d'hypothèses en résumant les données, généralement par le biais de représentations graphiques et de tableaux d'indicateurs statistiques. C'est une étape essentielle de toute analyse de recherche.
+L'objectif principal du *data profiling* est d'examiner la qualité des données comme la distribution des variables, la présence de valeurs aberrantes et autres anomalies afin de les nettoyer. C'est la première étape de l'analyse (exploratoire) de données ou *exploratory data analysis* (EDA). Le *data profiling* peut aussi fournir des outils pour la génération d'hypothèses en résumant les données, généralement par le biais de représentations graphiques et de tableaux d'indicateurs statistiques. C'est une étape essentielle de toute analyse de recherche.
 
 # Enjeux
 
--  Identifier les types de données, leur longueur et des modèles récurrents.
--  Découvrir les métadonnées et évaluer leur exactitude.
--  Etiquetter des données avec des mots-clés, des descriptions ou des catégories.
--  Effectuer une évaluation de la qualité des données (données manquantes, distributions)
--  Calculer de statistiques descriptives (min, max, compte, somme).
--  Identifier les distributions, les candidats clés, les candidats clés étrangères, les dépendances fonctionnelles, les dépendances de valeur intégrée et effectuer une analyse inter-tables.
+-   Identifier les types de données, leur longueur et des modèles récurrents.
+-   Découvrir les métadonnées et évaluer leur exactitude.
+-   Etiquetter des données avec des mots-clés, des descriptions ou des catégories.
+-   Effectuer une évaluation de la qualité des données (données manquantes, distributions)
+-   Calculer de statistiques descriptives (min, max, compte, somme).
+-   Identifier les distributions, les candidats clés, les candidats clés étrangères, les dépendances fonctionnelles, les dépendances de valeur intégrée et effectuer une analyse inter-tables.
 
-Dans le but de : 
+Dans le but de :
 
--  Gérer la qualité des données (ex éliminer ou imputer des données manquantes)
--  Recoder de variables
--  Générer des hypothèses sans *a priori*
+-   Gérer la qualité des données (ex éliminer ou imputer des données manquantes)
+-   Recoder de variables
+-   Générer des hypothèses sans *a priori*
 
 # Outils
 
-Il existe de nombreux outils de *data profiling* ou EDA.Les premiers ont été développés pour répondre aux enjeux et exigences des recherches dans les domaines **OMICS*. Ces outils sont propriétaires et payants ou gratuits et libres de droits. Les outils gratuits et open-sources sont plus ou moins faciles à installer et manipuler. 
+Il existe de nombreux outils de *data profiling* ou EDA.Les premiers ont été développés pour répondre aux enjeux et exigences des recherches dans les domaines \*\*OMICS\*. Ces outils sont propriétaires et payants ou gratuits et libres de droits. Les outils gratuits et open-sources sont plus ou moins faciles à installer et manipuler.
 
 Aujourd'hui, les principaux outils libres d'accès sont:
 
--  [White Rabbit](https://www.ohdsi.org/analytic-tools/whiterabbit-for-etl-design/)
--  [Orange](https://orangedatamining.com/)
--  [Knime](https://www.knime.com/)
--  [Aggregate Profiler](https://sourceforge.net/projects/dataquality/)
--  [DataCleaner](https://datacleaner.github.io/)
--  [Talend Open Studio for Data Quality](https://www.talend.com/products/talend-open-studio/)
--  [pandas_profiling](https://towardsdatascience.com/exploratory-data-analysis-with-pandas-profiling-de3aae2ddff3) (Librarie Python)
--  [Exploratory data anlaysis packages](https://journal.r-project.org/archive/2019/RJ-2019-033/RJ-2019-033.pdf)
+-   [White Rabbit](https://www.ohdsi.org/analytic-tools/whiterabbit-for-etl-design/)
+-   [Orange](https://orangedatamining.com/)
+-   [Knime](https://www.knime.com/)
+-   [Aggregate Profiler](https://sourceforge.net/projects/dataquality/)
+-   [DataCleaner](https://datacleaner.github.io/)
+-   [Talend Open Studio for Data Quality](https://www.talend.com/products/talend-open-studio/)
+-   [pandas_profiling](https://towardsdatascience.com/exploratory-data-analysis-with-pandas-profiling-de3aae2ddff3) (Librarie Python)
+-   [Exploratory data anlaysis packages](https://journal.r-project.org/archive/2019/RJ-2019-033/RJ-2019-033.pdf)
 
 # Précautions
 
--  Il faut connaître les données ou avoir un *data management book* qui décrit les variables de la base
--  Il faut toujours garder une copie des données sources
--  Il faut réfléchir aux conséquences d'une transformation de variable pour l'analyse (ne pas rajouter de bruit) et l'interprétation
--  IL faut choisir si une nouvelle variable doit être créée à partir de la tranformation d'une variable ou si la transformation remplace les valeurs de la varible existante (question de mémoire vs explotation des données)
+-   Il faut connaître les données ou avoir un *data management book* qui décrit les variables de la base
+-   Il faut toujours garder une copie des données sources
+-   Il faut réfléchir aux conséquences d'une transformation de variable pour l'analyse (ne pas rajouter de bruit) et l'interprétation
+-   Il faut choisir si une nouvelle variable doit être créée à partir de la tranformation d'une variable ou si la transformation remplace les valeurs de la varible existante (question de mémoire vs explotation des données)
