@@ -67,7 +67,7 @@ Pour utiliser ces *packages* dans une de vos sessions, vous devez les charger av
 
 **Chargez les packages.**
 
-```{r load library, solution = TRUE, eval = FALSE}
+```{r load library, solution = TRUE}
 
 library("readxl")
 library("data.table")
@@ -155,18 +155,19 @@ plot_intro(baseAllHosp)
 # mais si tel était le cas vous pourriez savoir dans quelles variables 
 # avec la fonction plot_missing()
 
-# Juste pour l'example ici nous remplacons les 0 par des NA
+# Juste pour exemple ici nous remplacons les 0 par des NA
 baseAllHosp2 <- baseAllHosp
 baseAllHosp2[baseAllHosp2==0] <- NA
 plot_intro(baseAllHosp2)
 plot_missing(baseAllHosp2)
+
 ```
 
 Il est souvent utile d'apprécier la distribution de vos variables quantitatives pour savoir si cela correspond bien à ce que vous attendiez.
 
 **Utliser la fonction *plot_histogram()* sur la base baseAllHosp**
 
-```{r introduce, solution = TRUE}
+```{r plot histo QA, solution = TRUE}
 plot_histogram(baseAllHosp)
 ```
 
