@@ -167,6 +167,9 @@ URL <- "https://www.data.gouv.fr/fr/datasets/r/6fadff46-9efd-4c53-942a-54aca783c
 # data provenant de data.gouv.fr
 baseAllHosp <- read.csv(URL, sep = ";")
 
+# création de la variable date
+baseAllHosp$date <- as.Date(baseAllHosp$jour)
+
 # transformation des données
 baseAllHosp$mois <- format(baseAllHosp$date, "%Y-%m")
 
@@ -208,14 +211,14 @@ Dans le logiciel *R* il existe de nombreux modules pour la représentation carto
 Dans cet atelier nous vous proposons un exemple d'utilisation de [*mapsf*](https://rgeomatic.hypotheses.org/category/cartography).
 
 
-```{r, eval=FALSE}
+```{r, eval=TRUE}
 sumByMonthDept <- aggregate(baseAllHosp$incid_hosp, 
           by = list(mois = baseAllHosp$mois, code_insee = baseAllHosp$dep), 
           FUN = sum)
 names(sumByMonthDept)[3] <- "incidence"
 ```
 
-```{r, eval=FALSE}
+```{r, eval=TRUE}
 
 # Charger les libraries utiles
 library(sf)
@@ -252,6 +255,7 @@ mf_map(x = incidence_oct2021,
        breaks = "jenks")
 ```
 
+**Présentez la carte en retirant les départements ultra-marins.**
 
 ```{r sans ultra-marin, solution = TRUE, eval=FALSE}
 
