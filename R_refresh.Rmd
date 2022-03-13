@@ -9,7 +9,7 @@ editor_options:
   chunk_output_type: inline
 ---
 
-Ceci est un petit rappel sur [R](https://cran.r-project.org) et son environement utilisateur ou GUI [RStudio](https://rstudio.org).
+Ceci est un petit rappel sur [R](https://cran.r-project.org) et son environement utilisateur (GUI) [RStudio](https://rstudio.org).
 
 # Le mode Projet
 
@@ -45,14 +45,14 @@ https://www.datanovia.com/en/blog/r-coding-style-best-practices/
 
 ### Pourquoi?
 
-- Une meilleure lisibilité du code, par vous même ou d'autres
+- Une meilleure lisibilité du code, pour vous même ou d'autres
 - Une meilleure maintenabilité, par vous même ou d'autres
 - Un respect des spécificités du langage utilisé, donc moins d'erreur
 - Une meilleure gestion des performances
 
 ### Comment?
 
-- Toujours **commenter** son code. En R le commentaire c'est avec un **#**
+- Toujours **commenter** son code. Avec *R* le commentaire c'est avec un **#**
 
 ```{r, eval=FALSE}
 # Création d'un vecteur x de longueur 1 et de valeur 2
@@ -62,7 +62,7 @@ y <- c("a", "c")
 ```
 
 - Adopter les régles de nommage de fichiers, fonctions et objects
-  - Noms explicitent, se terminant en *.R* pour les fichiers 
+  - Noms explicites, se terminant en *.R* pour les fichiers 
   - avec "_" si long
 ```{r, eval=FALSE}
 # Good
@@ -91,7 +91,7 @@ anxietyScale <- c("faible", "moyen","fort")
 
 # Notions de librairies
 
-R possède de nombreuses fonctions par défaut mais R est modulaire. Il est souvent indispensable d'ajouter des *packages* téléchargeables de différentes plateformes comme [CRAN](https://cran.r-project.org/), [Bioconductor](https://www.bioconductor.org/), Github
+*R* possède de nombreuses fonctions par défaut mais R est modulaire. Il est souvent indispensable d'ajouter des *packages* téléchargeables de différentes plateformes comme [CRAN](https://cran.r-project.org/), [Bioconductor](https://www.bioconductor.org/), Github
 
 Pour installer les *packages* sur votre ordianteur, vous pouvez les télécharger l'environment R.
 ```{r, eval=FALSE}
@@ -136,7 +136,7 @@ Les sites faisant références
 
 ## Lire des données
 
-**R est capable de lire les données de la plupart des formats**, y compris les fichiers créés dans d'autres packages statistiques. Que les données aient été préparées à l'aide d'Excel (au format CSV, XLSX ou TXT), SAS, Stata, SPSS ou autres, R peut lire et charger les données en mémoire.
+***R* est capable de lire les données de nombreux formats de données**, y compris les fichiers créés dans d'autres packages statistiques. Par exemple, *R* peut lire et charger en mémoire des données qui ont été préparées à l'aide d'Excel (au format CSV, XLSX ou TXT) ou  traiter par SAS, Stata, SPSS grâce au *package [foreign](https://cran.r-project.org/web/packages/foreign/index.html)* .
 
 
 ```{r, eval=FALSE}
@@ -146,15 +146,15 @@ Les sites faisant références
 
 Pour les données volumineuses vous pouvez utiliser *fread()* de la librairie **data.table**, optimisée pour les données en grande dimension.
 
-Sachez aussi que R peut encapsuler des commandes SQL pour faire du requêtage de base de données.
+Sachez aussi que *R* peut encapsuler des commandes SQL pour faire du requêtage sur des base de données.
 
 
 **Note:**
-Vérifier la bonne lecture des données avec des petits appels à fonctions comme *dim()*, *str()*, *head()*, *tail()*, *summary()* -- Attention toutefois si elles sont de grandes dimensions.
+Vérifier la bonne lecture des données avec des petits appels à fonctions comme *dim()*, *str()*, *head()*, *tail()*, *summary()* -- Attention toutefois si elles sont de grandes dimensions la sortie console peut être longue et difficilement exploitable.
 
 ## Sauvegarder/Charger un fichier 
 
-R a également deux formats de données natifs : **Rdata** (parfois abrégé en Rda) et **rds**. Ces formats sont utilisés lorsque les objets R sont enregistrés pour une utilisation ultérieure. **Rdata** est utilisé pour enregistrer plusieurs objets R, tandis que **rds** est utilisé pour enregistrer un seul objet R. 
+*R* a également deux formats de données natifs : **Rdata** (parfois abrégé en Rda) et **rds**. Ces formats sont utilisés lorsque les objets R sont enregistrés pour une utilisation ultérieure. **Rdata** est utilisé pour enregistrer plusieurs objets *R*, tandis que **rds** est utilisé pour enregistrer un seul objet *R*. 
 
 ```{r, eval=FALSE}
 
@@ -169,4 +169,4 @@ saveRDS(drug_anxiety_clean, file = "drug_anxiety_clean.rds")
 readRDS("drug_anxiety_clean.rds")
 ```
 
-Il est aussi possible de créer des fichiers CSV ou TXT à partir des objets R avec des appels aux fonctions de la famille *write.table()* (voir l'aide pour plus de détails)
+Il est aussi possible de créer des fichiers CSV ou TXT à partir des objets *R* avec des appels aux fonctions de la famille *write.table()* (voir l'aide pour plus de détails)
