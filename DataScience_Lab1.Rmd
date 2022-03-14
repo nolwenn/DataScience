@@ -3,14 +3,14 @@ title: "Science des Données - Lab 1"
 author: "Nolwenn Le Meur & Pascal Crépey"
 date: '`r format(Sys.time(), "%d %B, %Y")`'
 output:
-  unilur::tutorial_html_solution: default
+  unilur::tutorial_pdf: 
+    number_sections: true
+    toc: true
   unilur::answer_rmd: default
   unilur::tutorial_pdf_solution:
     number_sections: true
     toc: true
-  unilur::tutorial_pdf: 
-    number_sections: true
-    toc: true
+  unilur::tutorial_html_solution: default
   unilur::tutorial_html: default
 ---
 
@@ -179,7 +179,7 @@ Enfin, *DataExplorer* possède des fonctions similaires pour les variables quali
 
 Si vous utilisez `str()` sur *baseSC* et *baseHosp* vous constaterez que les noms des variables ne sont pas très explicites. Vous pouvez accéder au nom des variables grâce à la fonction `names()` et ainsi voir ou changer ainsi les noms de ces variables. Pour la base *baseHosp* il suffit de faire comme suit:
 
-```{r changeNames,  echo = TRUE}
+```{r changeNames,  echo = TRUE, eval=FALSE}
 #pour voir les noms
 names(baseHosp)
 #-> [1] "Indicateurs" "Valeur"  
@@ -206,7 +206,7 @@ Comme vous pouvez le constater en utilisant *str()*, le type des variables *hosp
 
 Le problème ici est que dans le fichier source les décimales sont marquées par des ","/virgules mais *R* fonctionne avec des "."/points. Si à la lecture du fichier nous ne l'avons pas spécifié, il faut le corriger après. Pour cela nous pouvons utliser la fonction `sub()` pour changer les "," en "." puis la fonction `as.numeric()` pour que le système comprenne que ce sont des chiffres et non pas des caractères. Pour la variable *hospitalisation* dans *baseHosp*, nous faisons ainsi:
 
-```{r, changetypeHosp, echo = TRUE}
+```{r, changetypeHosp, echo = TRUE, eval=FALSE}
 
 baseHosp$hospitalisation <- as.numeric(
   sub(pattern = ",", 
@@ -240,7 +240,7 @@ Pour créer une nouvelle variable (ou colonne) dans une base (*data.frame*) il s
 
 La variable *jour* est aussi une chaine de caractères et pas une *'vraie'* date pouvant être comprise par R. Nous allons donc générer une nouvelle variable de type *Date* à partir de cette variable. Pour cela, nous utilisons simplement la fonction `as.Date()`.
 
-```{r changeTypeDate, echo = TRUE}
+```{r changeTypeDate, echo = TRUE, eval=FALSE}
 
 baseHosp$date <- as.Date(baseHosp$jour)
 
@@ -304,7 +304,7 @@ Il y a deux façons de joindre les 2 bases :
 
 Pour "coller" des colonnes à une base, nous pouvons utiliser la fonction `cbind()` (*c* pour *column*).
 
-```{r join_col}
+```{r join_col, eval=FALSE}
 
 baseWide <- cbind(baseHosp, baseSC)
 head(baseWide)
@@ -336,7 +336,7 @@ Le package `dplyr` nous met à disposition tous les outils nécessaires pour ré
 
 La fonction pour joindre deux bases sur la base ensembliste de leur **intersection** est `inner_join()`.
 
-```{r inner_join}
+```{r inner_join, eval=FALSE}
 
 # Jointure sur la variable "jour"
 baseWide <- dplyr::inner_join(baseHosp, baseSC, by = "jour")
@@ -385,7 +385,7 @@ identical(names(baseHosp), names(baseSC))
 
 Pour savoir quelles colonnes diffèrent entre les bases, vous pouvez utiliser des opérations ensemblistes telle que la différence (`setdiff()`)
 
-```{r diff_colonnes, eval = TRUE}
+```{r diff_colonnes, eval = FALSE}
 
 # Différence entre les colonnes de "baseSC" et "baseHosp"
 setdiff(names(baseSC), names(baseHosp))
@@ -399,7 +399,7 @@ Nous voyons qu'il y a une différence sur le nom des colonnes "soins_critiques" 
 
 Nous allons redonner le même nom de "valeur" aux colonnes "soins_critiques" et "hospitalisation".
 
-```{r rename_colonnes, eval = TRUE}
+```{r rename_colonnes, eval = FALSE}
 
 names(baseHosp)[names(baseHosp) == "hospitalisation"] <- "valeur"
 names(baseSC)[names(baseSC) == "soins_critiques"] <- "valeur"
@@ -420,7 +420,7 @@ baseHosp$jour_semaine <- NULL
 
 On peut vérifier que maintenant les deux bases ont les mêmes colonnes
 
-```{r check_col, echo = TRUE}
+```{r check_col, echo = TRUE, eval=FALSE}
 
 identical(names(baseHosp), names(baseSC))
 
@@ -445,7 +445,7 @@ Enfin, avant de pouvoir joindre, il faut également s'assurer que les colonnes d
 
 Vous pouvez vérifier le type (ou la classe) d'une colonne à l'aide des fonctions "class()" ou "typeof()". Pour éviter de vérifier les colonnes une par une, vous pouvez utiliser la fonction "sapply"
 
-```{r check_coltype, echo = TRUE}
+```{r check_coltype, echo = TRUE, eval=FALSE}
 
 # Vérification une à une
 identical(class(baseHosp$jour), class(baseSC$jour))
