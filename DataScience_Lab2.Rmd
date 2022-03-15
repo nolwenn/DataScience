@@ -3,11 +3,11 @@ title: "Science des Données - Lab 2"
 author: "Nolwenn Le Meur & Pascal Crépey"
 date: '`r format(Sys.time(), "%d %B, %Y")`'
 output:
-  unilur::tutorial_pdf_solution:
+  unilur::tutorial_pdf: 
     number_sections: true
     toc: true
   unilur::answer_rmd: default
-  unilur::tutorial_pdf: 
+  unilur::tutorial_pdf_solution:
     number_sections: true
     toc: true
   unilur::tutorial_html_solution: default
@@ -40,7 +40,6 @@ baseAllHosp <- readRDS("baseAllHosp.rds")
 
 # Créer une série temporelle à partir des données
 
-```{block}
 Pour pouvoir être décomposée, la série temporelle doit être d'abord transformée en un objet spécial avec la fonction `ts()` à partir des données. Cette fonction permet d'inclure l'échelle de temps de la mesure dans les données.
 
 Il faut cependant définir la période de temps qui vous intéresse. Cela se fait en définissant la fréquence d'échantillonage. Par exemple, si vous avez des données quotidiennes et que vous voulez définir la période de temps en semaine, alors vous indiquerez `frequency = 7`.
@@ -50,8 +49,6 @@ Par exemple (si `x` contient les valeurs pour chaque pas de temps).
 
 Le paramètre `frequency` précise le nombre d'observations dans une période (i.e: 7 pour de l'hebdomadaire, 30.5 pour du mensuel, etc).
 
-
-```
 
 **Utilisez la fonction `ts()` pour créer une variable `hospit_ts` qui contiendra une série temporelle des hospitalisations avec une fenêtre hebdomadaire à partir de `baseLong`.**
 
@@ -84,7 +81,8 @@ plot(mydec)
 ```
 
 # Visualiser une série temporelle avec ggplot
-*Utilisez `ggplot`pour visualisez ces composantes sur un même graphique*
+
+- Utilisez la *librarie ggplot* pour visualiser ces composantes sur un même graphique
 
 ```{r ggplotmydec, eval=TRUE}
 
@@ -144,7 +142,7 @@ ggplot(baseLongAgg, aes(x = date, linetype = type)) +
 
 Pour réaliser une moyenne glissante, vous pouvez utiliser des fonctions disponibles dans la librairie `zoo`, telle que `rollmean()`. L'argument k de cette fonction fixe la taille de la fenêtre. 
 
-*Utilisez `rollmean` pour calculer des moyennes glissantes avec des fenêtre de 7 jours ou de 30 jours. Visualisez les résultats et comparez aux résultats précédents.*
+*Utilisez rollmean() pour calculer des moyennes glissantes avec des fenêtre de 7 jours ou de 30 jours. Visualisez les résultats et comparez aux résultats précédents.*
 
 ```{r rollmean, solution = TRUE, eval=TRUE}
 library(zoo)
@@ -172,7 +170,7 @@ La base baseAllHosp contient les données d'incidence journalière d'hospitalisa
 
 **Faites la somme par mois du nombre de nouvelles hospitalisations sur Paris. Pensez à créer une variable  *mois*, et utilisez la fonction `aggregate()` pour calculer cette somme. **
 
-```{r sumByMonthParis, eval=TRUE, solution=TRUE}
+```{r sumByMonthParis, eval=FALSE, solution=TRUE}
 
 URL <- "https://www.data.gouv.fr/fr/datasets/r/6fadff46-9efd-4c53-942a-54aca783c30c"
 
@@ -224,7 +222,7 @@ Dans cet atelier nous vous proposons un exemple d'utilisation de [*mapsf*](https
 
 Dans un premier temps, nous allons aggréger les incidences d'hospitalisation  avec l'instruction suivante. 
 
-```{r, eval=TRUE}
+```{r, eval=FALSE}
 sumByMonthDept <- aggregate(baseAllHosp$incid_hosp, 
           by = list(mois = baseAllHosp$mois, code_insee = baseAllHosp$dep), 
           FUN = sum)
@@ -241,7 +239,7 @@ names(sumByMonthDept)[3] <- "incidence"
 
 Ensuite, nous allons avoir besoin de lire des fichiers *Shape* qui définissent à l'aide de polygones les frontrières géographiques. Pour se faire vous devrez télécharger et charger le package *sf*.  Puis, pour la représentation cartographique nous allons utliser le package *mapsf*.
 
-```{r, eval=TRUE}
+```{r, eval=FALSE}
 
 # Charger les libraries utiles
 library(sf)
@@ -255,7 +253,7 @@ Nous allons lire les polygones géographiques des départements français. Pour 
 - Utiliser les instructions ci-dessous pour lire le fichier shape
 - Que font les différentes instructions?
 
-```{r, eval=TRUE}
+```{r, eval=FALSE}
 # Lire le fichier shape pour la France
 FrMap <- st_read(dsn="departements-2017/.", quiet = TRUE)
 FrMap$code_insee[FrMap$code_insee=="69D"] <- "69"
@@ -307,7 +305,7 @@ incidence_oct2021_metro <- incidence_oct2021[- ultra_marin, ]
 ```
 
 - Refaire la représentation cartographique
-- Sauvegarder la carte
+- Sauvegarder votre carte
 
 ```{r carte sans ultra-marin, solution = TRUE, eval=TRUE}
 mf_map(x = incidence_oct2021_metro, 
