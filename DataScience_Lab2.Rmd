@@ -66,7 +66,7 @@ Cet objet `ts` est ensuite facilement exploitable par les outils de décompositi
 
 *Utilisez la fonction `decompose()` pour extraire la tendance, la saisonalité hebdomadaire et le résidu. Vous pouvez directement utiliser la fonction `plot()` sur cette décomposition.*
 
-```{r decompose, solution = TRUE}
+```{r decompose, solution = TRUE, eval=FALSE}
 
 mydec <- decompose(myts, type = "additive")
 
@@ -103,7 +103,7 @@ Pour changer l'agrégation temporelle de jour à semaine ou mois, il suffit de c
 
 *Faites une agrégation par semaine et par mois.*
 
-```{r aggr, solution = TRUE}
+```{r aggr, solution = TRUE, eval=FALSE}
 
 baseLong$mois <- format(baseLong$date, "%Y-%B")
 baseLong$semaine <- format(baseLong$date, "%Y-%V")
@@ -117,7 +117,7 @@ baseLongAgg <- baseLongAgg %>% group_by(semaine, type) %>% mutate(valeur_semaine
 
 *Visualisez graphiquement ces nouvelles valeurs.*
 
-```{r plotagg, solution  = TRUE}
+```{r plotagg, solution  = TRUE, eval=FALSE}
 
 ggplot(baseLongAgg, aes(x = date, linetype = type)) +
   geom_line(aes(y = valeur_mois), color = "green") +
@@ -134,7 +134,7 @@ Pour réaliser une moyenne glissante, vous pouvez utiliser des fonctions disponi
 
 *Utilisez `rollmean` pour calculer des moyennes glissantes avec des fenêtre de 7 jours ou de 30 jours. Visualisez les résultats et comparez aux résultats précédents.*
 
-```{r rollmean, solution = TRUE}
+```{r rollmean, solution = TRUE, eval=FALSE}
 library(zoo)
 
 baseLongRmean <- baseLong %>% group_by(type) %>% 
@@ -160,7 +160,7 @@ La base baseAllHosp contient les données d'incidence journalière d'hospitalisa
 
 **Faites la somme par mois du nombre de nouvelles hospitalisations sur Paris. Pensez à créer une variable  *mois*, et utilisez la fonction `aggregate()` pour calculer cette somme. **
 
-```{r sumByMonthParis, solution = TRUE}
+```{r sumByMonthParis, eval=TRUE, solution=TRUE}
 
 URL <- "https://www.data.gouv.fr/fr/datasets/r/6fadff46-9efd-4c53-942a-54aca783c30c"
 
@@ -210,6 +210,7 @@ Dans le logiciel *R* il existe de nombreux modules pour la représentation carto
 
 Dans cet atelier nous vous proposons un exemple d'utilisation de [*mapsf*](https://rgeomatic.hypotheses.org/category/cartography).
 
+Dans un premier temps, nous allons aggréger les incidences d'hospitalisation  avec l'instruction suivante. Quel(s) est(sont) le niveau d'aggrégation?
 
 ```{r, eval=TRUE}
 sumByMonthDept <- aggregate(baseAllHosp$incid_hosp, 
@@ -218,12 +219,23 @@ sumByMonthDept <- aggregate(baseAllHosp$incid_hosp,
 names(sumByMonthDept)[3] <- "incidence"
 ```
 
+Ensuite, nous allons avoir besoin de lire des fichiers *Shape* qui définissent à l'aide de polygones les frontrières géographiques. Pour se faire vous devrez télécharger et charger le *package sf*.  Puis pour la représentation cartographique nous allons utliser le *package mapsf*.
+
 ```{r, eval=TRUE}
 
 # Charger les libraries utiles
 library(sf)
 library(mapsf)
 
+```
+
+Nous allons lire les polygones géographiques des départements français. Pour ce faire vous devez télécharger les données sources soit sur le site de IGN ou le dossier departements-2017 (version simplifiée) sur https://github.com/nolwenn/DataScience. 
+
+- Sauvegarder le dossier dans votre dossier de projet R.
+- Utiliser les instructions ci-dessous pour lire le fichier shape
+- Que font les différentes instructions?
+
+```{r, eval=TRUE}
 # Lire le fichier shape pour la France
 FrMap <- st_read(dsn="departements-2017/.", quiet = TRUE)
 FrMap$code_insee[FrMap$code_insee=="69D"] <- "69"
@@ -232,15 +244,22 @@ FrMap$code_insee[FrMap$code_insee=="69D"] <- "69"
 FrMap_incidence <- full_join( FrMap, sumByMonthDept, by="code_insee" )
 ```
 
+Nous allons nous focaliser sur le mois de mars 2021. 
 
+- Utiliser l'instruction ci-dessous pour filtrer les données.
 
 ```{r, echo=TRUE, eval=FALSE}
 incidence_mars2021 <- FrMap_incidence %>% 
   dplyr::filter(mois == "2021-03")
+````
 
+- Utiliser la fonction *mf_map()* de la *library mapsf* pour faire une crate chorapleth de l'incidence de mars 2021. [Pensez à regarder l'aide de la fonction].
+
+```{r, eval=FALSE}
 mf_map(x = incidence_mars2021, var = "incidence", type = "choro")
 ```
 
+- Refaire la même chose pour le mois d'octobre 2021
 
 ```{r, solution = TRUE, eval=FALSE}
 incidence_oct2021 <- FrMap_incidence %>% 
@@ -255,13 +274,22 @@ mf_map(x = incidence_oct2021,
        breaks = "jenks")
 ```
 
+Vous pouvez remarquer que la carte n'est pas lisible puisque n'est pas centrer sur la France. Pour un focus sur la métropole, nous allons mettre à part les départements ultra-marins.
+
+- Suivez les instructions ci-dessous pourse faire.
+
 **Présentez la carte en retirant les départements ultra-marins.**
 
-```{r sans ultra-marin, solution = TRUE, eval=FALSE}
+```{r sans ultra-marin, eval=FALSE}
 
 ultra_marin <- grep("^97", incidence_oct2021$code_insee)
 incidence_oct2021_metro <- incidence_oct2021[- ultra_marin, ]
+```
 
+- Refaire la représentation cartographique
+- Sauvegarder la carte
+
+```{r carte sans ultra-marin, solution = TRUE, eval=FALSE}
 mf_map(x = incidence_oct2021_metro, 
        var = "incidence", 
        type = "choro", 
