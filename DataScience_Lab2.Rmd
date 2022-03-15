@@ -220,9 +220,25 @@ Dans le logiciel *R* il existe de nombreux modules pour la représentation carto
 
 Dans cet atelier nous vous proposons un exemple d'utilisation de [*mapsf*](https://rgeomatic.hypotheses.org/category/cartography).
 
+Pour repartir d'une base propre indépendante des étapes précédentes, vous pouvez exécuter le code suivant:
+```{r, eval = FALSE}
+URL <- "https://www.data.gouv.fr/fr/datasets/r/6fadff46-9efd-4c53-942a-54aca783c30c"
+
+# data provenant de data.gouv.fr
+baseAllHosp <- read.csv(URL, sep = ";")
+
+# création de la variable date
+baseAllHosp$date <- as.Date(baseAllHosp$jour)
+
+# transformation des données
+baseAllHosp$mois <- format(baseAllHosp$date, "%Y-%m")
+
+```
+
 Dans un premier temps, nous allons aggréger les incidences d'hospitalisation  avec l'instruction suivante. 
 
 ```{r, eval=FALSE}
+
 sumByMonthDept <- aggregate(baseAllHosp$incid_hosp, 
           by = list(mois = baseAllHosp$mois, code_insee = baseAllHosp$dep), 
           FUN = sum)
@@ -300,7 +316,7 @@ Vous pouvez remarquer que la carte n'est pas lisible puisque n'est pas centrer s
 
 ```{r sans ultra-marin, eval=TRUE}
 
-ultra_marin <- grep("^97", incidence_oct2021$code_insee)
+ultra_marin <- grep("97", incidence_oct2021$code_insee)
 incidence_oct2021_metro <- incidence_oct2021[- ultra_marin, ]
 ```
 
