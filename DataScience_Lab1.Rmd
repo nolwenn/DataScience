@@ -3,14 +3,14 @@ title: "Science des Données - Lab 1"
 author: "Nolwenn Le Meur & Pascal Crépey"
 date: '`r format(Sys.time(), "%d %B, %Y")`'
 output:
-  unilur::tutorial_pdf: 
-    number_sections: true
-    toc: true
-  unilur::answer_rmd: default
   unilur::tutorial_pdf_solution:
     number_sections: true
     toc: true
+  unilur::answer_rmd: default
   unilur::tutorial_html_solution: default
+  unilur::tutorial_pdf: 
+    number_sections: true
+    toc: true
   unilur::tutorial_html: default
 ---
 
@@ -143,7 +143,7 @@ Lorsque vous importez des données dans R, vous pouvez aussi utiliser des *packa
 
 Pour exemple, vous allez utliser quelques fonctions du *package DataExplorer*. 
 
-**Explorer l'utilité des fonction *introduce()* et *plot_intro() sur la base baseAllHosp**
+**Explorer l'utilité des fonction *introduce()* et *plot_intro()* sur la base baseAllHosp**
 
 ```{r introduce, solution = TRUE}
 
@@ -262,6 +262,7 @@ L'avantage du type *Date* c'est que vous pouvez ensuite faire des calculs sur ce
 
 ```{r jour_semaine, solution = TRUE, eval = TRUE}
 
+baseHosp$date <- as.Date(baseHosp$jour)
 baseHosp$jour_semaine <- wday(baseHosp$date)
 
 ```
@@ -272,9 +273,8 @@ Nous voulons maintenant catégoriser les incidences d'hospitalisation en trois n
 
 **Utilisez la fonction `quantile` pour trouver les bornes.**
 
-```{r quantile, solution = TRUE}
+```{r quantile, solution = TRUE ,eval=FALSE}
 quantile(baseHosp$hospitalisation, probs = c(0, 0.33, 0.66, 1))
-
 ```
 
 **Utilisez la fonction `cut` pour créer une nouvelle variable catégorielle *hospit_category.***
@@ -399,7 +399,7 @@ Nous voyons qu'il y a une différence sur le nom des colonnes "soins_critiques" 
 
 Nous allons redonner le même nom de "valeur" aux colonnes "soins_critiques" et "hospitalisation".
 
-```{r rename_colonnes, eval = FALSE}
+```{r rename_colonnes, eval = TRUE}
 
 names(baseHosp)[names(baseHosp) == "hospitalisation"] <- "valeur"
 names(baseSC)[names(baseSC) == "soins_critiques"] <- "valeur"
@@ -465,7 +465,7 @@ Par convention, on dira que la base jointe est au format "long".
 
 **Joignez les deux bases au format long.**
 
-```{r, rbind, solution = TRUE, echo = TRUE}
+```{r rbind, solution = TRUE, echo = TRUE}
 
 baseLong <- rbind(baseHosp, baseSC)
 
