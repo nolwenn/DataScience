@@ -1,11 +1,14 @@
 ---
 title: "R refresh"
 author: "Nolwenn Le Meur & Pascal Crépey"
-date: '`r format(Sys.time(), "%d %B, %Y")`'
-output: 
+date: "`r format(Sys.time(), "%d %B, %Y")`"
+output:
+  html_document:
+    toc: yes
+    df_print: paged
   html_notebook:
-   toc: yes
-editor_options: 
+    toc: yes
+editor_options:
   chunk_output_type: inline
 ---
 
