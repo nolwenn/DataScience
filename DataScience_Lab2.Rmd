@@ -57,7 +57,15 @@ Le paramètre `frequency` précise le nombre d'observations dans une période (i
 
 ```{r ts, solution = TRUE, eval = TRUE}
 
-baseH <- baseLong[baseLong$type=="hospitalisation",]
+#en R de base
+baseH <- baseLong[baseLong$type == "hospitalisation",]
+
+#en dplyr
+baseH <- baseLong  |> filter(type == "hospitalisation")
+
+#en data.table
+#baseH = baseLong[type=="hospitalisation",]
+
 myts <- ts(baseH$valeur, 
           frequency = 7)
 
@@ -227,7 +235,7 @@ names(sumByMonthDept)[3] <- "incidence"
 
 ```{r, solution = TRUE}
 
-# Le niveau d'agrégation est le mois. 
+# Le niveau d'agrégation est le mois et le département.
 
 ```
 
