@@ -1,27 +1,10 @@
 ---
-title: "Science des Données - Lab 1"
-author: "Nolwenn Le Meur & Pascal Crépey"
-date: '`r format(Sys.time(), "%d %B, %Y")`'
-output:
-  unilur::answer_rmd: default
-  unilur::tutorial_pdf_solution:
-    number_sections: true
-    toc: true
-  unilur::tutorial_html_solution: default
-  unilur::tutorial_pdf: 
-    number_sections: true
-    toc: true
-  unilur::tutorial_html: default
+title: "My answers"
+author: "My name"
+date: "2024-03-05"
+output: html_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, eval=TRUE)
-library(data.table)
-library(ggplot2)
-library(readxl)
-theme_set(theme_minimal())
-
-```
 
 L'objectif de cet atelier est d'utiliser différentes méthodes de manipulation (importation, structure) de données pour une (meilleure) préparation à leur analyse.
 
@@ -53,29 +36,19 @@ Si vous ne les avez jamais téléchargés sur votre ordinateur depuis votre dern
 
 **Installez ces packages.**
 
-```{r installpackage, solution = TRUE, eval = FALSE}
-
-install.packages("readxl")
-install.packages("data.table")
-install.packages("dplyr")
-install.packages("ggplot2")
-install.packages("DataExplorer")
-
+```{r}
+# Write your answer here
 ```
+
 
 Pour utiliser ces *packages* dans une de vos sessions, vous devez les charger avec la fonction `library()`. Ce chargement doit être fait à chaque nouvelle session.
 
 **Chargez les packages.**
 
-```{r load library, solution = TRUE}
-
-library("readxl")
-library("data.table")
-library("dplyr")
-library("ggplot2")
-library("DataExplorer")
-
+```{r}
+# Write your answer here
 ```
+
 
 # Manipuler une base de données
 
@@ -85,16 +58,10 @@ Nous allons charger la base des nouvelles admissions hospitalières quotidiennes
 
 **Chargez les données provenant de data.gouv.fr dans la variable baseAllHosp.**
 
-```{r load, solution = TRUE, eval = TRUE, cache=TRUE}
-
-URL <- "https://www.data.gouv.fr/fr/datasets/r/6fadff46-9efd-4c53-942a-54aca783c30c"
-
-# data provenant de data.gouv.fr
-baseAllHosp <- read.csv(URL, sep = ";")
-
-# si vous utiliser le package data.table
-#baseAllHosp <- fread(URL)
+```{r}
+# Write your answer here
 ```
+
 
 Vous pouvez aussi charger des données à partir d'autres sources comme des fichiers TXT ou CSV mais aussi des fichiers propriétaires come SAS, STATA ou encore Excel. Pour Excel par exemple, nous pouvons utiliser la fonction `read_xlsx()` du package *readxl*.
 
@@ -102,16 +69,10 @@ Pour notre atelier, vous devez charger les fichiers Geodes_SoinsCritiques_Covid1
 
 **Chargez les données provenant d'Excel dans les variables baseSC et baseHosp.**
 
-```{r loadxlsx, solution = TRUE, eval = TRUE}
-
-?read_xlsx
-
-baseSC <- read_xlsx("Geodes_SoinsCritiques_Covid19.xlsx", 
-                   skip = 3, n_max = 667, sheet = "Graphiques")
-baseHosp <- read_xlsx("Geodes_Hospit_Covid19.xlsx", 
-                     skip = 3, n_max = 667, sheet = "Graphiques")
-
+```{r}
+# Write your answer here
 ```
+
 
 ## Décrire une base de données
 
@@ -123,21 +84,10 @@ Vous pouvez utiliser la fonction `str()` (*structure*) pour un premier aperçu d
 
 **Quel est le type de la variable *jour* dans baseAllHosp ?**
 
-```{r str, eval = FALSE, solution = TRUE}
-
-str(baseAllHosp)
-
-# 'data.frame':	67320 obs. of  6 variables:
-#  $ dep       : chr  "01" "01" "01" "01" ...
-#  $ jour      : chr  "2020-03-19" "2020-03-20" "2020-03-21" "2020-03-22" ...
-#  $ incid_hosp: int  1 0 3 3 14 11 13 14 14 7 ...
-#  $ incid_rea : int  0 0 0 1 1 1 2 3 2 3 ...
-#  $ incid_dc  : int  0 0 0 0 0 0 0 2 0 1 ...
-#  $ incid_rad : int  0 1 0 1 5 4 5 2 0 3 ...
-
-# La variable jour est de type character
-
+```{r}
+# Write your answer here
 ```
+
 
 Lorsque vous importez des données dans R, vous pouvez aussi utiliser des *packages* développés pour le *Data Profiling* avand de vous lancez dans *l'analyse exploratoire (EDA)*. Ces outils proposent des fonctions pour la caractérisation et le contrôle qualité des variables d'une base de données. 
 
@@ -145,31 +95,19 @@ Pour exemple, vous allez utliser quelques fonctions du *package DataExplorer*.
 
 **Explorer l'utilité des fonction *introduce()* et *plot_intro()* sur la base baseAllHosp**
 
-```{r introduce, solution = TRUE}
-
-# Utilisation de DataExplorer pour premier QA
-introduce(baseAllHosp)
-plot_intro(baseAllHosp)
-
-# Nous n'avons pas de données manquantes 
-# mais si tel était le cas vous pourriez savoir dans quelles variables 
-# avec la fonction plot_missing()
-
-# Juste pour exemple ici nous remplacons les 0 par des NA
-baseAllHosp2 <- baseAllHosp
-baseAllHosp2[baseAllHosp2==0] <- NA
-plot_intro(baseAllHosp2)
-plot_missing(baseAllHosp2)
-
+```{r}
+# Write your answer here
 ```
+
 
 Il est souvent utile d'apprécier la distribution de vos variables quantitatives pour savoir si cela correspond bien à ce que vous attendiez.
 
 **Utliser la fonction *plot_histogram()* sur la base baseAllHosp**
 
-```{r plot histo QA, solution = TRUE}
-plot_histogram(baseAllHosp)
+```{r}
+# Write your answer here
 ```
+
 
 Enfin, *DataExplorer* possède des fonctions similaires pour les variables qualitatives et explorer la corrélation entre variables.
 
@@ -179,26 +117,13 @@ Enfin, *DataExplorer* possède des fonctions similaires pour les variables quali
 
 Si vous utilisez `str()` sur *baseSC* et *baseHosp* vous constaterez que les noms des variables ne sont pas très explicites. Vous pouvez accéder au nom des variables grâce à la fonction `names()` et ainsi voir ou changer ainsi les noms de ces variables. Pour la base *baseHosp* il suffit de faire comme suit:
 
-```{r changeNames,  echo = TRUE, eval=FALSE}
-#pour voir les noms
-names(baseHosp)
-#-> [1] "Indicateurs" "Valeur"  
-#pour les changer
-names(baseHosp) <- c("jour", "hospitalisation")
-```
 
 **Faites la même chose pour la base baseSC en donnant le nom 'soins_critiques' à la variable 'Valeur'.**
 
-```{r, changeNamesBaseSC, eval = TRUE, solution = TRUE}
-#pour voir les noms
-names(baseSC)
-#-> [1] "Indicateurs" "Valeur"  
-#pour les changer
-names(baseSC) <- c("jour", "soins_critiques")
-#pour baseHosp
-names(baseHosp) <- c("jour", "hospitalisation")
-
+```{r}
+# Write your answer here
 ```
+
 
 ## Changer le type d'une variable
 
@@ -206,31 +131,13 @@ Comme vous pouvez le constater en utilisant *str()*, le type des variables *hosp
 
 Le problème ici est que dans le fichier source les décimales sont marquées par des ","/virgules mais *R* fonctionne avec des "."/points. Si à la lecture du fichier nous ne l'avons pas spécifié, il faut le corriger après. Pour cela nous pouvons utliser la fonction `sub()` pour changer les "," en "." puis la fonction `as.numeric()` pour que le système comprenne que ce sont des chiffres et non pas des caractères. Pour la variable *hospitalisation* dans *baseHosp*, nous faisons ainsi:
 
-```{r, changetypeHosp, echo = TRUE, eval=FALSE}
-
-baseHosp$hospitalisation <- as.numeric(
-  sub(pattern = ",", 
-      replacement = ".", 
-      x = baseHosp$hospitalisation)
-  )
-
-str(baseHosp)
-# tibble [667 × 2] (S3: tbl_df/tbl/data.frame)
-#  $ jour           : chr [1:667] "2020-03-07" "2020-03-08" "2020-03-09" "2020-03-10" ...
-#  $ hospitalisation: num [1:667] 0 0 0 0 0 0 2.9 3.6 4.4 5.7 ...
-```
 
 **Faites la même chose pour baseSC.**
 
-```{r, changetypeSC, echo = TRUE, solution = TRUE, eval=TRUE}
-
-baseSC$soins_critiques = as.numeric(
-  sub(pattern = ",", 
-      replacement = ".", 
-      x = baseSC$soins_critiques)
-  )
-
+```{r}
+# Write your answer here
 ```
+
 
 ## Générer ou recoder une variable
 
@@ -240,32 +147,22 @@ Pour créer une nouvelle variable (ou colonne) dans une base (*data.frame*) il s
 
 La variable *jour* est aussi une chaine de caractères et pas une *'vraie'* date pouvant être comprise par R. Nous allons donc générer une nouvelle variable de type *Date* à partir de cette variable. Pour cela, nous utilisons simplement la fonction `as.Date()`.
 
-```{r changeTypeDate, echo = TRUE, eval=FALSE}
-
-baseHosp$date <- as.Date(baseHosp$jour)
-
-```
 
 **Faites la même chose pour baseSC et baseAllHosp.**
 
-```{r changeTypeDate all, solution = TRUE, eval = TRUE}
-
-baseSC$date <- as.Date(baseSC$jour)
-
-baseAllHosp$date <- as.Date(baseAllHosp$jour)
-
+```{r}
+# Write your answer here
 ```
+
 
 L'avantage du type *Date* c'est que vous pouvez ensuite faire des calculs sur ces dates, comme ajouter ou retirer des jours (+/-), récupérer le numéro de la semaine (`week()`), ou le numéro du jour dans la semaine (`wday()`).
 
 **Générer une nouvelle variable *jour_semaine* dans baseHosp**
 
-```{r jour_semaine, solution = TRUE, eval = TRUE}
-
-baseHosp$date <- as.Date(baseHosp$jour)
-baseHosp$jour_semaine <- wday(baseHosp$date)
-
+```{r}
+# Write your answer here
 ```
+
 
 ### Discrétiser une variable
 
@@ -273,21 +170,17 @@ Nous voulons maintenant catégoriser les incidences d'hospitalisation en trois n
 
 **Utilisez la fonction `quantile` pour trouver les bornes.**
 
-```{r quantile, solution = TRUE ,eval=FALSE}
-quantile(baseHosp$hospitalisation, probs = c(0, 0.33, 0.66, 1))
+```{r}
+# Write your answer here
 ```
+
 
 **Utilisez la fonction `cut` pour créer une nouvelle variable catégorielle *hospit_category.***
 
-```{r cut, solution = TRUE, eval =FALSE}
-
-bornes <- quantile(baseHosp$hospitalisation, probs = c(0, 0.33, 0.66, 1))
-
-baseHosp$hospit_category <- cut(baseHosp$hospitalisation, 
-                               breaks = bornes, 
-                               include.lowest = TRUE,
-                               labels= c("basse", "moyenne", "haute"))
+```{r}
+# Write your answer here
 ```
+
 
 ## Joindre deux bases de données
 
@@ -304,23 +197,15 @@ Il y a deux façons de joindre les 2 bases :
 
 Pour "coller" des colonnes à une base, nous pouvons utiliser la fonction `cbind()` (*c* pour *column*).
 
-```{r join_col, eval=FALSE}
-
-baseWide <- cbind(baseHosp, baseSC)
-head(baseWide)
-
-```
 
 Cependant, ce n'est pas exactement ce que nous souhaitons car nous avons collé toutes les colonnes de baseSC sur baseHosp, et nous avons donc des colonnes dupliquées, ce qui n'est pas utile et encombre la mémoire.
 
 **Collez les colonnes qui nous intéressent, en l'occurrence la seule colonne "soins_critiques".**
 
-```{r join_col2, solution = TRUE, eval = TRUE}
-
-baseWide <- cbind(baseHosp, baseSC$soins_critiques)
-head(baseWide)
-
+```{r}
+# Write your answer here
 ```
+
 
 Nous avons finalement bien les colonnes que nous souhaitons. **Cependant il y a un problème fondamental** avec cette méthode. Les colonnes sont collées "telles quelles", c'est à dire que les lignes sont mises bout-à-bout dans l'ordre où elles se présentent. Or, le plus souvent, nous voulons coller les colonnes en s'assurant que chaque ligne soit alignée avec la ligne correspondante de l'autre base, par exemple s'il s'agit d'un même patient, ou comme ici, d'une même date.
 
@@ -336,34 +221,16 @@ Le package `dplyr` nous met à disposition tous les outils nécessaires pour ré
 
 La fonction pour joindre deux bases sur la base ensembliste de leur **intersection** est `inner_join()`.
 
-```{r inner_join, eval=FALSE}
-
-# Jointure sur la variable "jour"
-baseWide <- dplyr::inner_join(baseHosp, baseSC, by = "jour")
-head(baseWide)
-
-```
 
 **Réalisez une jointure sur la variable date.**
 
-```{r inner_join2, solution = TRUE, eval = TRUE}
-
-# Jointure sur la variable "date"
-baseWide <- dplyr::inner_join(baseHosp, baseSC, by = "date")
-head(baseWide)
-# Il est possible de joindre sur plusieurs variables à la fois
-baseWide <- dplyr::inner_join(baseHosp, baseSC, by = c("jour", "date"))
-head(baseWide)
+```{r}
+# Write your answer here
 ```
+
 
 Il est possible de joindre sur une variable qui a un nom différent dans chaque base
 
-```{r inner_join3, eval = FALSE}
-
-baseWide <- dplyr::inner_join(baseHosp, baseSC, by = c("jour" = "date"))
-head(baseWide)
-
-```
 
 Cette dernière commande produit une erreur car les colonnes "jour" et "date" n'ont pas le type et donc ne peuvent pas être comparées pour joindre les bases.
 
@@ -377,23 +244,13 @@ Puisque nous voulons coller les bases verticalement, il faut s'assurer qu'elles 
 
 **Vérifiez si les colonnes des deux bases sont identiques en utilisant la fonction *`identical()`***
 
-```{r comparaison_colonnes, solution = TRUE, eval = TRUE}
-
-identical(names(baseHosp), names(baseSC))
-
+```{r}
+# Write your answer here
 ```
+
 
 Pour savoir quelles colonnes diffèrent entre les bases, vous pouvez utiliser des opérations ensemblistes telle que la différence (`setdiff()`)
 
-```{r diff_colonnes, eval = FALSE}
-
-# Différence entre les colonnes de "baseSC" et "baseHosp"
-setdiff(names(baseSC), names(baseHosp))
-
-# Différence entre les colonnes de "baseHosp" et "baseSC"
-setdiff(names(baseHosp), names(baseSC))
-
-```
 
 Nous voyons qu'il y a une différence sur le nom des colonnes "soins_critiques" et "hospitalisation", et que baseHosp a une colonne "jour_semaine" supplémentaire.
 
@@ -412,19 +269,13 @@ Pour supprimer une colonne, il suffit de lui attribuer la valeur spéciale "NULL
 
 **Supprimez la colonne "*jour_semaine*".**
 
-```{r remove_col, solution = TRUE, eval = TRUE}
-
-baseHosp$jour_semaine <- NULL
-
+```{r}
+# Write your answer here
 ```
+
 
 On peut vérifier que maintenant les deux bases ont les mêmes colonnes
 
-```{r check_col, echo = TRUE, eval=FALSE}
-
-identical(names(baseHosp), names(baseSC))
-
-```
 
 Il reste une dernière étape importante avant de joindre les bases. Si nous les joignons telles quelles, nous ne pourrons plus faire la différence entre les valeurs de baseHosp et de baseSC dans la base jointe.
 
@@ -432,12 +283,10 @@ Il faut donc créer une variable dans chaque base qui permettra de les identifie
 
 **Créez une variable "type" qui aura pour valeur "hospitalisation" pour la base "baseHosp" et "soins_critiques" pour la base "baseSC"**
 
-```{r hospitbasehosp, solution = TRUE, echo = TRUE}
-
-baseHosp$type <- "hospitalisation"
-baseSC$type <- "soins_critiques"
-
+```{r}
+# Write your answer here
 ```
+
 
 Enfin, avant de pouvoir joindre, il faut également s'assurer que les colonnes de chaque base sont du même type. Si vous essayez de joindre deux colonnes qui ont le même nom, mais qui en réalité sont de type différent, R essayera de convertir automatiquement le type d'une des colonnes, **SANS VOUS AVERTIR**, ce qui peut avoir des effets très indésirables (et donner lieu de joyeuses heures de débugage...)
 
@@ -445,19 +294,6 @@ Enfin, avant de pouvoir joindre, il faut également s'assurer que les colonnes d
 
 Vous pouvez vérifier le type (ou la classe) d'une colonne à l'aide des fonctions "class()" ou "typeof()". Pour éviter de vérifier les colonnes une par une, vous pouvez utiliser la fonction "sapply"
 
-```{r check_coltype, echo = TRUE, eval=FALSE}
-
-# Vérification une à une
-identical(class(baseHosp$jour), class(baseSC$jour))
-identical(class(baseHosp$valeur), class(baseSC$valeur))
-
-# Vérification automatique
-sapply(baseHosp, class)
-sapply(baseSC, class)
-
-identical(sapply(baseHosp, class), sapply(baseSC, class))
-
-```
 
 Nous pouvons finalement joindre les deux bases verticalement avec la fonction `rbind()` (r pour *row*)
 
@@ -465,27 +301,22 @@ Par convention, on dira que la base jointe est au format "long".
 
 **Joignez les deux bases au format long.**
 
-```{r rbind, solution = TRUE, echo = TRUE}
-
-baseLong <- rbind(baseHosp, baseSC)
-
+```{r}
+# Write your answer here
 ```
+
 
 **Vérifiez que le nombre de lignes de baseLong est bien égale à la somme des lignes des deux bases initiales.**
 
-```{r verifnumlignes, echo = TRUE, solution = TRUE}
-
-identical(nrow(baseLong), nrow(baseHosp) + nrow(baseSC))
-
+```{r}
+# Write your answer here
 ```
+
 
 **Sauvegardez les bases *baseLong* et *baseAllHosp* dans les fichiers *baseLong.rds* et *baseAllHosp.rds* grâce à la fonction `saveRDS()`**
 
-```{r saveRDS, echo = TRUE, solution = TRUE}
-
-saveRDS(baseLong, file = "baseLong.rds")
-
-saveRDS(baseAllHosp, file = "baseAllHosp.rds")
-
+```{r}
+# Write your answer here
 ```
+
 
